@@ -77,6 +77,22 @@ export type Hotel = {
   created_at: string;
 };
 
+export type TaskTemplate = {
+  id: string;
+  hotel_id: string;
+  title: string;
+  description: string;
+  department: Department;
+  type: TaskType;
+  priority: TaskPriority;
+  assigned_role: UserRole;
+  checklist: ChecklistItem[];
+  days_of_week: number[]; // 0=Sun … 6=Sat
+  time_of_day: string;    // "HH:MM"
+  is_active: boolean;
+  created_at: string;
+};
+
 export type Notification = {
   id: string;
   hotel_id: string;
