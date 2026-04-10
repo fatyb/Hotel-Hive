@@ -118,3 +118,93 @@
     transition: background-color 0.2s, color 0.2s;
   }
 }
+
+/* ── Landing page animations ── */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(32px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.92); }
+  to   { opacity: 1; transform: scale(1); }
+}
+@keyframes slide-left {
+  from { opacity: 0; transform: translateX(-32px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes slide-right {
+  from { opacity: 0; transform: translateX(32px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-10px); }
+}
+@keyframes float-reverse {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(10px); }
+}
+@keyframes shimmer {
+  from { background-position: -200% center; }
+  to   { background-position:  200% center; }
+}
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.5; transform: scale(1.4); }
+}
+@keyframes draw-line {
+  from { stroke-dashoffset: 300; }
+  to   { stroke-dashoffset: 0; }
+}
+@keyframes count-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-up     { animation: fade-up    0.7s cubic-bezier(0.16,1,0.3,1) both; }
+.animate-fade-in     { animation: fade-in    0.6s ease both; }
+.animate-scale-in    { animation: scale-in   0.6s cubic-bezier(0.16,1,0.3,1) both; }
+.animate-slide-left  { animation: slide-left  0.7s cubic-bezier(0.16,1,0.3,1) both; }
+.animate-slide-right { animation: slide-right 0.7s cubic-bezier(0.16,1,0.3,1) both; }
+.animate-float       { animation: float 4s ease-in-out infinite; }
+.animate-float-rev   { animation: float-reverse 4s ease-in-out infinite; }
+.animate-pulse-dot   { animation: pulse-dot 2s ease-in-out infinite; }
+
+.delay-100 { animation-delay: 0.1s; }
+.delay-150 { animation-delay: 0.15s; }
+.delay-200 { animation-delay: 0.2s; }
+.delay-300 { animation-delay: 0.3s; }
+.delay-400 { animation-delay: 0.4s; }
+.delay-500 { animation-delay: 0.5s; }
+.delay-600 { animation-delay: 0.6s; }
+.delay-700 { animation-delay: 0.7s; }
+.delay-800 { animation-delay: 0.8s; }
+
+/* Shimmer text */
+.text-shimmer {
+  background: linear-gradient(90deg, #FA7866 0%, #ffb3a8 40%, #FA7866 60%, #E55C49 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer 3s linear infinite;
+}
+
+/* SVG underline draw */
+.svg-draw path {
+  stroke-dasharray: 300;
+  stroke-dashoffset: 300;
+  animation: draw-line 1s cubic-bezier(0.16,1,0.3,1) 0.8s forwards;
+}
+
+/* Paused until in-view */
+.in-view-ready {
+  opacity: 0;
+}
+.in-view-ready.in-view {
+  opacity: 1;
+}
