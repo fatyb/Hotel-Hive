@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ClipboardList, CalendarDays, User } from "lucide-react";
+import { ClipboardList, CalendarDays, User, ConciergeBell } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const TABS = [
-  { href: "/mes-taches", label: "Tâches",   Icon: ClipboardList },
-  { href: "/du-jour",    label: "Du jour",  Icon: CalendarDays  },
-  { href: "/profil",     label: "Profil",   Icon: User          },
+  { href: "/mes-taches", label: "Tâches",    Icon: ClipboardList  },
+  { href: "/du-jour",    label: "Du jour",   Icon: CalendarDays   },
+  { href: "/reception",  label: "Réception", Icon: ConciergeBell  },
+  { href: "/profil",     label: "Profil",    Icon: User           },
 ] as const;
 
 export default function BottomNav() {

@@ -33,6 +33,7 @@ export type Task = {
   is_recurring: boolean;
   photos: string[];
   checklist: ChecklistItem[];
+  created_at?: string;
   // UI helpers (not in DB)
   location?: string;
 };

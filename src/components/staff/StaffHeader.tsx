@@ -5,7 +5,8 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { LogoMark } from "@/components/ui/Logo";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { Bell } from "lucide-react";
 
 export default function StaffHeader() {
@@ -56,22 +57,18 @@ export default function StaffHeader() {
         <span className="text-[15px] font-bold tracking-tight">HotelHive</span>
       </div>
 
-      <Button
-        variant="ghost"
-        size="icon"
-        asChild
-        className="ml-auto relative"
+      <Link
+        href="/alertes"
         onClick={() => setUnread(0)}
+        className={cn(buttonVariants({ variant: "ghost", size: "icon" }), "ml-auto relative")}
       >
-        <Link href="/alertes">
-          <Bell className="w-5 h-5" strokeWidth={1.5} />
-          {unread > 0 && (
-            <span className="absolute top-1 right-1 min-w-[16px] h-4 bg-primary text-primary-foreground text-[10px] font-bold rounded-full flex items-center justify-center px-1 ring-2 ring-background">
-              {unread > 9 ? "9+" : unread}
-            </span>
-          )}
-        </Link>
-      </Button>
+        <Bell className="w-5 h-5" strokeWidth={1.5} />
+        {unread > 0 && (
+          <span className="absolute top-1 right-1 min-w-[16px] h-4 bg-primary text-primary-foreground text-[10px] font-bold rounded-full flex items-center justify-center px-1 ring-2 ring-background">
+            {unread > 9 ? "9+" : unread}
+          </span>
+        )}
+      </Link>
     </header>
   );
 }

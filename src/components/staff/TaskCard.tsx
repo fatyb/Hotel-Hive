@@ -4,7 +4,8 @@ import Link from "next/link";
 import { MapPin, ChevronRight, CheckCircle } from "lucide-react";
 import { Task, TaskStatus, Department } from "@/types";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { Card, CardContent } from "@/components/ui/card";
 
 type Props = {
@@ -93,11 +94,9 @@ export default function TaskCard({ task, onStart, onDone }: Props) {
                 Terminé
               </Button>
             )}
-            <Button variant="outline" size="icon" asChild>
-              <Link href={`/mes-taches/${task.id}`}>
-                <ChevronRight className="w-4 h-4" strokeWidth={1.5} />
-              </Link>
-            </Button>
+            <Link href={`/mes-taches/${task.id}`} className={cn(buttonVariants({ variant: "outline", size: "icon" }))}>
+              <ChevronRight className="w-4 h-4" strokeWidth={1.5} />
+            </Link>
           </div>
         )}
 

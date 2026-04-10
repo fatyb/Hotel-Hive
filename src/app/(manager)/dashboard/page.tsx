@@ -6,7 +6,8 @@ import Link from "next/link";
 import { Task, TaskStatus } from "@/types";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AlertTriangle, Clock, CheckCircle, BedDouble, ChevronRight, Users, TrendingUp } from "lucide-react";
 
@@ -157,11 +158,9 @@ export default function DashboardPage() {
                 {stats.tasksTodo + stats.tasksInProgress} tâche{stats.tasksTodo + stats.tasksInProgress !== 1 ? "s" : ""} en attente
               </CardDescription>
             </div>
-            <Button variant="link" size="sm" asChild className="text-primary shrink-0 p-0 h-auto">
-              <Link href="/taches" className="flex items-center gap-1 text-xs font-semibold">
-                Voir tout <ChevronRight className="w-3.5 h-3.5" strokeWidth={2} />
-              </Link>
-            </Button>
+            <Link href="/taches" className="flex items-center gap-1 text-xs font-semibold text-primary shrink-0 hover:underline">
+              Voir tout <ChevronRight className="w-3.5 h-3.5" strokeWidth={2} />
+            </Link>
           </CardHeader>
 
           {recentTasks.length === 0 ? (
@@ -217,9 +216,9 @@ export default function DashboardPage() {
                 <CardTitle className="text-[15px]">Statut des chambres</CardTitle>
                 <CardDescription>{stats.roomsTotal} chambres au total</CardDescription>
               </div>
-              <Button variant="ghost" size="icon" asChild className="w-7 h-7">
-                <Link href="/chambres"><ChevronRight className="w-4 h-4" strokeWidth={1.5} /></Link>
-              </Button>
+              <Link href="/chambres" className={cn(buttonVariants({ variant: "ghost", size: "icon" }), "w-7 h-7")}>
+                <ChevronRight className="w-4 h-4" strokeWidth={1.5} />
+              </Link>
             </CardHeader>
             <CardContent className="flex flex-col gap-4">
               <div className="flex items-center gap-4">
@@ -262,9 +261,9 @@ export default function DashboardPage() {
           <Card>
             <CardHeader className="flex-row items-center justify-between pb-3">
               <CardTitle className="text-[15px]">Équipe</CardTitle>
-              <Button variant="ghost" size="icon" asChild className="w-7 h-7">
-                <Link href="/equipe"><ChevronRight className="w-4 h-4" strokeWidth={1.5} /></Link>
-              </Button>
+              <Link href="/equipe" className={cn(buttonVariants({ variant: "ghost", size: "icon" }), "w-7 h-7")}>
+                <ChevronRight className="w-4 h-4" strokeWidth={1.5} />
+              </Link>
             </CardHeader>
             <CardContent className="flex flex-col gap-4">
               <div className="flex items-center gap-4">
@@ -286,11 +285,9 @@ export default function DashboardPage() {
                   <p className="text-[11px] text-muted-foreground mt-0.5">Terminées</p>
                 </div>
               </div>
-              <Button variant="outline" asChild className="w-full">
-                <Link href="/equipe" className="flex items-center justify-center gap-1.5">
-                  Voir l&apos;équipe <ChevronRight className="w-3.5 h-3.5" strokeWidth={1.5} />
-                </Link>
-              </Button>
+              <Link href="/equipe" className={cn(buttonVariants({ variant: "outline" }), "w-full flex items-center justify-center gap-1.5")}>
+                Voir l&apos;équipe <ChevronRight className="w-3.5 h-3.5" strokeWidth={1.5} />
+              </Link>
             </CardContent>
           </Card>
         </div>
