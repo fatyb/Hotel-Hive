@@ -9,16 +9,20 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
-import { LayoutDashboard, ClipboardList, BedDouble, Users, BarChart3, Settings, LogOut, RefreshCcw } from "lucide-react";
+import { LayoutDashboard, ClipboardList, BedDouble, Users, BarChart3, Settings, LogOut, RefreshCcw, ConciergeBell } from "lucide-react";
 
 const NAV = [
-  { href: "/dashboard",  label: "Vue d'ensemble", icon: LayoutDashboard },
-  { href: "/taches",     label: "Tâches",          icon: ClipboardList  },
-  { href: "/chambres",   label: "Chambres",         icon: BedDouble      },
-  { href: "/equipe",     label: "Équipe",           icon: Users          },
-  { href: "/templates",  label: "Templates",        icon: RefreshCcw     },
-  { href: "/rapports",   label: "Rapports",         icon: BarChart3      },
-  { href: "/hotel",      label: "Mon hôtel",        icon: Settings       },
+  { href: "/dashboard",    label: "Vue d'ensemble", icon: LayoutDashboard },
+  { href: "/taches",       label: "Tâches",          icon: ClipboardList  },
+  { href: "/chambres",     label: "Chambres",         icon: BedDouble      },
+  { href: "/equipe",       label: "Équipe",           icon: Users          },
+  { href: "/templates",    label: "Templates",        icon: RefreshCcw     },
+  { href: "/rapports",     label: "Rapports",         icon: BarChart3      },
+  { href: "/hotel",        label: "Mon hôtel",        icon: Settings       },
+];
+
+const NAV_EXTERNAL = [
+  { href: "/front-office", label: "Front Office",    icon: ConciergeBell  },
 ];
 
 export default function Sidebar() {
@@ -40,7 +44,7 @@ export default function Sidebar() {
         .single();
       if (data) {
         setUserName(data.full_name);
-        setHotelName((data as { hotels?: { name: string } }).hotels?.name ?? "");
+        setHotelName(((data as unknown) as { hotels?: { name: string } }).hotels?.name ?? "");
       }
     }
     load();
@@ -80,6 +84,22 @@ export default function Sidebar() {
           );
         })}
       </nav>
+
+      {/* Front Office link */}
+      <div className="px-3 pb-2">
+        <Separator className="mb-2" />
+        {NAV_EXTERNAL.map(({ href, label, icon: Icon }) => (
+          <Link key={href} href={href}>
+            <Button
+              variant="ghost"
+              className="w-full justify-start gap-3 font-semibold text-primary hover:text-primary hover:bg-primary/10"
+            >
+              <Icon className="w-[18px] h-[18px] shrink-0" strokeWidth={1.5} />
+              {label}
+            </Button>
+          </Link>
+        ))}
+      </div>
 
       <Separator />
 

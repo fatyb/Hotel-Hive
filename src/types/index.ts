@@ -78,6 +78,21 @@ export type Hotel = {
   created_at: string;
 };
 
+export type OrderStatus = "en_attente" | "en_cours" | "livree" | "annulee";
+
+export type RoomOrder = {
+  id: string;
+  hotel_id: string;
+  room_id?: string;
+  room_number: string;
+  title: string;
+  notes: string;
+  status: OrderStatus;
+  priority: "normale" | "urgente";
+  created_at: string;
+  updated_at: string;
+};
+
 export type TaskTemplate = {
   id: string;
   hotel_id: string;
