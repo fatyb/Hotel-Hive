@@ -59,6 +59,8 @@ export type Room = {
   updated_at: string;
 };
 
+export type ShiftType = "matin" | "apres-midi" | "nuit" | "repos";
+
 export type UserProfile = {
   id: string;
   hotel_id: string;
@@ -67,6 +69,11 @@ export type UserProfile = {
   avatar_url?: string;
   is_active: boolean;
   push_token?: string;
+  phone_number?: string;
+  assigned_floor?: number;
+  shift_type?: ShiftType;
+  working_hours?: string;
+  pin_code?: string;
 };
 
 export type Hotel = {
