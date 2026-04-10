@@ -97,8 +97,6 @@ export default function ReceptionPage() {
   const [newLocation,   setNewLocation]   = useState("");
   const [creating,      setCreating]      = useState(false);
 
-  const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
-
   // Clock tick
   useEffect(() => {
     const id = setInterval(() => setTime(nowHHMM()), 30000);
@@ -110,7 +108,30 @@ export default function ReceptionPage() {
     setChecklist(loadChecklist());
   }, []);
 
-  // ── Load data ──────────────────────────────────────────────────────────────
+  // ── Fetch data only (no channel setup) ────────────────────────────────────
+  const fetchData = useCallback(async (hid: string) => {
+    const [{ data: tasks }, { data: roomsData }] = await Promise.all([
+      supabase
+        .from("tasks")
+        .select("*, profiles:assigned_to(full_name)")
+        .eq("hotel_id", hid)
+        .eq("type", "urgente")
+        .in("status", ["a_faire", "en_cours"])
+        .order("created_at", { ascending: false })
+        .limit(20),
+      supabase
+        .from("rooms")
+        .select("*")
+        .eq("hotel_id", hid)
+        .order("floor")
+        .order("number"),
+    ]);
+    setUrgentTasks(tasks ?? []);
+    setRooms(roomsData ?? []);
+    setLoading(false);
+  }, []);
+
+  // ── Initial load — auth + profile, then data ───────────────────────────────
   const load = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
@@ -125,43 +146,27 @@ export default function ReceptionPage() {
     if (!profile?.hotel_id) return;
     setHotelId(profile.hotel_id);
     setUserName(profile.full_name?.split(" ")[0] ?? "");
+    await fetchData(profile.hotel_id);
+  }, [fetchData]);
 
-    const [{ data: tasks }, { data: roomsData }] = await Promise.all([
-      supabase
-        .from("tasks")
-        .select("*, profiles:assigned_to(full_name)")
-        .eq("hotel_id", profile.hotel_id)
-        .eq("type", "urgente")
-        .in("status", ["a_faire", "en_cours"])
-        .order("created_at", { ascending: false })
-        .limit(20),
-      supabase
-        .from("rooms")
-        .select("*")
-        .eq("hotel_id", profile.hotel_id)
-        .order("floor")
-        .order("number"),
-    ]);
+  useEffect(() => { load(); }, [load]);
 
-    setUrgentTasks(tasks ?? []);
-    setRooms(roomsData ?? []);
-    setLoading(false);
-
-    // Realtime for urgent tasks
-    if (channelRef.current) supabase.removeChannel(channelRef.current);
-    channelRef.current = supabase
-      .channel("reception-tasks")
+  // ── Realtime — set up once when hotelId is known ──────────────────────────
+  useEffect(() => {
+    if (!hotelId) return;
+    const channel = supabase
+      .channel("reception-tasks-" + hotelId)
       .on("postgres_changes", {
         event: "*", schema: "public", table: "tasks",
-        filter: `hotel_id=eq.${profile.hotel_id}`,
-      }, () => { load(); })
+        filter: `hotel_id=eq.${hotelId}`,
+      }, () => fetchData(hotelId))
+      .on("postgres_changes", {
+        event: "*", schema: "public", table: "rooms",
+        filter: `hotel_id=eq.${hotelId}`,
+      }, () => fetchData(hotelId))
       .subscribe();
-  }, []);
-
-  useEffect(() => {
-    load();
-    return () => { if (channelRef.current) supabase.removeChannel(channelRef.current); };
-  }, [load]);
+    return () => { supabase.removeChannel(channel); };
+  }, [hotelId, fetchData]);
 
   // ── Checklist toggle ───────────────────────────────────────────────────────
   function toggleCheck(id: string) {
@@ -248,7 +253,7 @@ export default function ReceptionPage() {
         <Button
           variant="outline"
           size="icon"
-          onClick={load}
+          onClick={() => fetchData(hotelId)}
           title="Actualiser"
         >
           <RefreshCcw className="w-4 h-4" />

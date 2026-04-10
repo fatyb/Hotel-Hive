@@ -136,15 +136,29 @@ export default function FrontOfficePage() {
   const [newOrder,     setNewOrder]     = useState({ title: "", room_number: "", notes: "", priority: "normale" as "normale" | "urgente" });
   const [creatingOrder, setCreatingOrder] = useState(false);
 
-  const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
-
   // ── Clock ─────────────────────────────────────────────────────────────────────
   useEffect(() => {
     const id = setInterval(() => setTime(nowTime()), 30000);
     return () => clearInterval(id);
   }, []);
 
-  // ── Load ──────────────────────────────────────────────────────────────────────
+  // ── Fetch data only (no channel setup) ────────────────────────────────────────
+  const fetchData = useCallback(async (hid: string) => {
+    const [{ data: roomsData }, { data: tasksData }, { data: ordersData }] = await Promise.all([
+      supabase.from("rooms").select("*").eq("hotel_id", hid).order("floor").order("number"),
+      supabase.from("tasks").select("*, profiles:assigned_to(full_name)")
+        .eq("hotel_id", hid).in("status", ["a_faire", "en_cours"]).order("created_at", { ascending: false }),
+      supabase.from("room_orders").select("*").eq("hotel_id", hid)
+        .not("status", "eq", "annulee").order("created_at", { ascending: false }).limit(50),
+    ]);
+    setRooms(roomsData ?? []);
+    setTasks(tasksData ?? []);
+    setOrders(ordersData ?? []);
+    setUrgents((tasksData ?? []).filter(t => t.type === "urgente" && t.status === "a_faire"));
+    setLoading(false);
+  }, []);
+
+  // ── Initial load — auth + profile, then data ──────────────────────────────────
   const load = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { window.location.href = "/login"; return; }
@@ -160,34 +174,21 @@ export default function FrontOfficePage() {
     setHotelId(profile.hotel_id);
     setUserName(profile.full_name ?? "");
     setHotelName(((profile as unknown) as { hotels?: { name: string } }).hotels?.name ?? "");
+    await fetchData(profile.hotel_id);
+  }, [fetchData]);
 
-    const [{ data: roomsData }, { data: tasksData }, { data: ordersData }] = await Promise.all([
-      supabase.from("rooms").select("*").eq("hotel_id", profile.hotel_id).order("floor").order("number"),
-      supabase.from("tasks").select("*, profiles:assigned_to(full_name)")
-        .eq("hotel_id", profile.hotel_id).in("status", ["a_faire", "en_cours"]).order("created_at", { ascending: false }),
-      supabase.from("room_orders").select("*").eq("hotel_id", profile.hotel_id)
-        .not("status", "eq", "annulee").order("created_at", { ascending: false }).limit(50),
-    ]);
+  useEffect(() => { load(); }, [load]);
 
-    setRooms(roomsData ?? []);
-    setTasks(tasksData ?? []);
-    setOrders(ordersData ?? []);
-    setUrgents((tasksData ?? []).filter(t => t.type === "urgente" && t.status === "a_faire"));
-    setLoading(false);
-
-    // Realtime
-    if (channelRef.current) supabase.removeChannel(channelRef.current);
-    channelRef.current = supabase.channel("fo-realtime")
-      .on("postgres_changes", { event: "*", schema: "public", table: "tasks",      filter: `hotel_id=eq.${profile.hotel_id}` }, () => load())
-      .on("postgres_changes", { event: "*", schema: "public", table: "rooms",      filter: `hotel_id=eq.${profile.hotel_id}` }, () => load())
-      .on("postgres_changes", { event: "*", schema: "public", table: "room_orders",filter: `hotel_id=eq.${profile.hotel_id}` }, () => load())
-      .subscribe();
-  }, []);
-
+  // ── Realtime — set up once when hotelId is known ──────────────────────────────
   useEffect(() => {
-    load();
-    return () => { if (channelRef.current) supabase.removeChannel(channelRef.current); };
-  }, [load]);
+    if (!hotelId) return;
+    const channel = supabase.channel("fo-realtime-" + hotelId)
+      .on("postgres_changes", { event: "*", schema: "public", table: "tasks",       filter: `hotel_id=eq.${hotelId}` }, () => fetchData(hotelId))
+      .on("postgres_changes", { event: "*", schema: "public", table: "rooms",       filter: `hotel_id=eq.${hotelId}` }, () => fetchData(hotelId))
+      .on("postgres_changes", { event: "*", schema: "public", table: "room_orders", filter: `hotel_id=eq.${hotelId}` }, () => fetchData(hotelId))
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [hotelId, fetchData]);
 
   // ── Update room status ─────────────────────────────────────────────────────
   async function setRoomStatus(room: Room, status: RoomStatus) {
@@ -529,7 +530,7 @@ export default function FrontOfficePage() {
               )}
             </div>
 
-            <Button size="sm" variant="ghost" onClick={load} className="gap-1.5 ml-auto shrink-0 h-8 text-xs">
+            <Button size="sm" variant="ghost" onClick={() => fetchData(hotelId)} className="gap-1.5 ml-auto shrink-0 h-8 text-xs">
               <RefreshCcw className="w-3.5 h-3.5" />
               Actualiser
             </Button>
