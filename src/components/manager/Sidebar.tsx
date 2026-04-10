@@ -9,13 +9,14 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
-import { LayoutDashboard, ClipboardList, BedDouble, Users, LogOut } from "lucide-react";
+import { LayoutDashboard, ClipboardList, BedDouble, Users, BarChart3, LogOut } from "lucide-react";
 
 const NAV = [
   { href: "/dashboard", label: "Vue d'ensemble", icon: LayoutDashboard },
   { href: "/taches",    label: "Tâches",          icon: ClipboardList  },
   { href: "/chambres",  label: "Chambres",         icon: BedDouble      },
   { href: "/equipe",    label: "Équipe",           icon: Users          },
+  { href: "/rapports",  label: "Rapports",         icon: BarChart3      },
 ];
 
 export default function Sidebar() {
