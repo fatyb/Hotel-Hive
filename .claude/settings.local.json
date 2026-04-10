@@ -1,0 +1,42 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx create-next-app@latest . --typescript --tailwind --eslint --app --src-dir --import-alias \"@/*\" --no-turbopack)",
+      "Bash(npx create-next-app@latest . --typescript --tailwind --eslint --app --src-dir --import-alias \"@/*\" --no-turbopack --yes)",
+      "Read(//d/web/**)",
+      "Bash(npx create-next-app@latest hotel-hive-setup --typescript --tailwind --eslint --app --src-dir --import-alias \"@/*\" --no-turbopack --yes)",
+      "Bash(cp -r D:/web/hotel-hive-setup/. D:/web/Hotel-Hive/)",
+      "Bash(rm -rf D:/web/hotel-hive-setup)",
+      "Bash(npm run:*)",
+      "Bash(npm install:*)",
+      "Bash(cp -r \"D:/web/Hotel-Hive/src/app/\\(dashboard\\)/.\" \"D:/web/Hotel-Hive/src/app/\\(manager\\)/\")",
+      "Bash(find \"D:/web/Hotel-Hive/src/app/\\(dashboard\\)\" -type f)",
+      "Bash(xargs grep:*)",
+      "Bash(grep -n \"router\" D:/web/Hotel-Hive/src/app/\\\\\\(staff\\\\\\)/mes-taches/[id]/page.tsx)",
+      "Bash(find D:/web/Hotel-Hive -maxdepth 1 -type f \\\\\\(-name tailwind* -o -name *config* \\\\\\))",
+      "Bash(grep -r @variant D:/web/Hotel-Hive/node_modules/@tailwindcss/ --include=*.css --include=*.md)",
+      "Bash(del \"D:\\\\web\\\\Hotel-Hive\\\\src\\\\components\\\\ThemeProvider.tsx\")",
+      "Bash(grep -r \"@custom-variant\\\\|dark:\" D:webHotel-Hivenode_modulestailwindcss --include=*.css --include=*.mjs --include=*.js)",
+      "Bash(grep -r dark: D:webHotel-Hive --include=*.tsx --include=*.jsx --include=*.html)",
+      "Bash(grep -E '\\\\.\\(css|mts|mjs|ts|js\\)$')",
+      "Bash(find D:/web/Hotel-Hive -maxdepth 3 -type f \\\\\\(-name *.config.js -o -name *.config.ts -o -name tailwind* \\\\\\))",
+      "Bash(find D:/web/Hotel-Hive/src -type f \\\\\\(-name *.tsx -o -name *.ts -o -name *.css \\\\\\))",
+      "Bash(find D:/web/Hotel-Hive/src -type f \\\\\\(-name *.css -o -name *.scss \\\\\\))",
+      "Bash(grep -rn \"addVariant\\\\|@variant\\\\|variant:\" D:/web/Hotel-Hive/node_modules/tailwindcss/dist/*.d.ts D:/web/Hotel-Hive/node_modules/tailwindcss/dist/*.d.mts)",
+      "Bash(powershell -Command \"Get-Content ''C:\\\\Users\\\\mbouz\\\\.claude\\\\projects\\\\D--web-Hotel-Hive\\\\8950dcb0-afe1-4699-ac26-6b023332fde5.jsonl'' | Select-String ''pattern0_2029'' | Select-Object -First 3\")",
+      "Bash(powershell -Command \"$content = Get-Content ''C:\\\\Users\\\\mbouz\\\\.claude\\\\projects\\\\D--web-Hotel-Hive\\\\8950dcb0-afe1-4699-ac26-6b023332fde5.jsonl'' -Raw; $match = [regex]::Match\\($content, ''Use this logo : \\(<svg.*?</svg>\\)''\\); if\\($match.Success\\) { $match.Groups[1].Value | Out-File ''C:\\\\Users\\\\mbouz\\\\AppData\\\\Local\\\\Temp\\\\logo.txt'' -Encoding UTF8; Write-Host ''Saved, length: '' + $match.Groups[1].Value.Length } else { Write-Host ''Not found'' }\")",
+      "Bash(powershell -NoProfile -ExecutionPolicy Bypass -Command \"$content = [System.IO.File]::ReadAllText\\(''C:\\\\Users\\\\mbouz\\\\.claude\\\\projects\\\\D--web-Hotel-Hive\\\\8950dcb0-afe1-4699-ac26-6b023332fde5.jsonl''\\); $start = $content.IndexOf\\(''data:image/png;base64,''\\); $end = $content.IndexOf\\(''\"\"'', $start + 22\\); $b64 = $content.Substring\\($start + 22, $end - $start - 22\\); [System.IO.File]::WriteAllText\\(''C:\\\\Users\\\\mbouz\\\\AppData\\\\Local\\\\Temp\\\\logo_b64.txt'', $b64\\); Write-Host \\(''Length: '' + $b64.Length\\)\")",
+      "Bash(powershell -NoProfile -ExecutionPolicy Bypass -File \"C:\\\\Users\\\\mbouz\\\\AppData\\\\Local\\\\Temp\\\\extract_logo.ps1\")",
+      "Bash(powershell -NoProfile -ExecutionPolicy Bypass -File \"C:\\\\Users\\\\mbouz\\\\AppData\\\\Local\\\\Temp\\\\save_logo.ps1\")",
+      "Bash(powershell -NoProfile -ExecutionPolicy Bypass -File \"C:\\\\Users\\\\mbouz\\\\AppData\\\\Local\\\\Temp\\\\save_logo2.ps1\")",
+      "Bash(powershell -NoProfile -ExecutionPolicy Bypass -File \"C:\\\\Users\\\\mbouz\\\\AppData\\\\Local\\\\Temp\\\\save_logo3.ps1\")",
+      "Bash(powershell -NoProfile -Command \"Get-Item ''D:\\\\web\\\\Hotel-Hive\\\\public\\\\logo.png'' | Select-Object Name, Length\")",
+      "Bash(cat tailwind.config.*)",
+      "Bash(npx shadcn@latest init --help)",
+      "Bash(npx shadcn@latest init -y --defaults)",
+      "Bash(npx shadcn@latest add card badge dialog select input textarea tabs avatar dropdown-menu separator label switch progress skeleton toast sonner -y)",
+      "Bash(npx shadcn@latest add card badge dialog select input textarea tabs avatar dropdown-menu separator label switch progress skeleton sonner -y)",
+      "Bash(git add:*)"
+    ]
+  }
+}
