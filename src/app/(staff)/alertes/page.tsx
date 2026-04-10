@@ -5,33 +5,24 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Notification } from "@/types";
 import {
-  ClipboardList,
-  Zap,
-  CheckCircle,
-  AlertTriangle,
-  BedDouble,
-  Clock,
-  MessageCircle,
-  Bell,
+  ClipboardList, Zap, CheckCircle, AlertTriangle, BedDouble, Clock, MessageCircle, Bell,
 } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type IconComponent = React.ComponentType<{ className?: string; strokeWidth?: number }>;
-
-type TypeConfig = {
-  Icon: IconComponent;
-  iconColor: string;
-  color: string;
-  bg: string;
-};
+type TypeConfig = { Icon: IconComponent; iconBg: string; iconColor: string; linkColor: string };
 
 const TYPE_CONFIG: Record<string, TypeConfig> = {
-  task_assigned:  { Icon: ClipboardList,   iconColor: "text-blue-500",   color: "text-blue-600",   bg: "bg-blue-50"   },
-  urgent:         { Icon: Zap,             iconColor: "text-[#FA7866]",  color: "text-[#FA7866]",  bg: "bg-[#FFF1EF]" },
-  completed:      { Icon: CheckCircle,     iconColor: "text-green-500",  color: "text-green-600",  bg: "bg-green-50"  },
-  issue_reported: { Icon: AlertTriangle,   iconColor: "text-amber-500",  color: "text-amber-600",  bg: "bg-amber-50"  },
-  room_ready:     { Icon: BedDouble,       iconColor: "text-sky-500",    color: "text-sky-600",    bg: "bg-sky-50"    },
-  task_late:      { Icon: Clock,           iconColor: "text-red-500",    color: "text-red-600",    bg: "bg-red-50"    },
-  note_added:     { Icon: MessageCircle,   iconColor: "text-purple-500", color: "text-purple-600", bg: "bg-purple-50" },
+  task_assigned:  { Icon: ClipboardList, iconBg: "bg-blue-50",       iconColor: "text-blue-500",   linkColor: "text-blue-600"   },
+  urgent:         { Icon: Zap,           iconBg: "bg-primary/10",    iconColor: "text-primary",    linkColor: "text-primary"    },
+  completed:      { Icon: CheckCircle,   iconBg: "bg-green-50",      iconColor: "text-green-500",  linkColor: "text-green-600"  },
+  issue_reported: { Icon: AlertTriangle, iconBg: "bg-amber-50",      iconColor: "text-amber-500",  linkColor: "text-amber-600"  },
+  room_ready:     { Icon: BedDouble,     iconBg: "bg-sky-50",        iconColor: "text-sky-500",    linkColor: "text-sky-600"    },
+  task_late:      { Icon: Clock,         iconBg: "bg-destructive/10",iconColor: "text-destructive",linkColor: "text-destructive"},
+  note_added:     { Icon: MessageCircle, iconBg: "bg-purple-50",     iconColor: "text-purple-500", linkColor: "text-purple-600" },
 };
 
 function timeAgo(iso: string) {
@@ -47,12 +38,11 @@ function timeAgo(iso: string) {
 
 function groupByDay(notifications: Notification[]) {
   const groups: Record<string, Notification[]> = {};
-  const now   = new Date();
-  const today = now.toDateString();
+  const now       = new Date();
+  const today     = now.toDateString();
   const yesterday = new Date(now.getTime() - 86400000).toDateString();
-
   for (const n of notifications) {
-    const d = new Date(n.created_at).toDateString();
+    const d   = new Date(n.created_at).toDateString();
     const key = d === today ? "Aujourd'hui" : d === yesterday ? "Hier" : "Plus tôt";
     if (!groups[key]) groups[key] = [];
     groups[key].push(n);
@@ -61,8 +51,8 @@ function groupByDay(notifications: Notification[]) {
 }
 
 export default function AlertesPage() {
-  const supabase  = createClient();
-  const router    = useRouter();
+  const supabase = createClient();
+  const router   = useRouter();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading,       setLoading]       = useState(true);
 
@@ -70,107 +60,82 @@ export default function AlertesPage() {
     async function load() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
-
-      const { data } = await supabase
-        .from("notifications")
-        .select("*")
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: false })
-        .limit(50);
-
+      const { data } = await supabase.from("notifications")
+        .select("*").eq("user_id", user.id).order("created_at", { ascending: false }).limit(50);
       if (data) setNotifications(data);
       setLoading(false);
-
-      // Mark all as read
-      await supabase
-        .from("notifications")
-        .update({ is_read: true })
-        .eq("user_id", user.id)
-        .eq("is_read", false);
+      await supabase.from("notifications").update({ is_read: true }).eq("user_id", user.id).eq("is_read", false);
     }
     load();
   }, []);
 
   async function handleClick(n: Notification) {
-    if (n.data?.task_id) {
-      router.push(`/mes-taches/${n.data.task_id}`);
-    }
+    if (n.data?.task_id) router.push(`/mes-taches/${n.data.task_id}`);
   }
 
   const groups = groupByDay(notifications);
+  const unreadCount = notifications.filter((n) => !n.is_read).length;
 
   return (
     <div className="max-w-lg mx-auto px-4 pb-4">
       <header className="pt-6 pb-4">
-        <h1 className="text-[22px] font-extrabold text-[#1E1E1E] tracking-tight">Alertes</h1>
-        <p className="text-[13px] text-gray-400 mt-0.5">
-          {notifications.filter((n) => !n.is_read).length > 0
-            ? `${notifications.filter((n) => !n.is_read).length} non lue(s)`
-            : "Tout est à jour"}
+        <h1 className="text-[22px] font-extrabold tracking-tight">Alertes</h1>
+        <p className="text-sm text-muted-foreground mt-0.5">
+          {unreadCount > 0 ? `${unreadCount} non lue(s)` : "Tout est à jour"}
         </p>
       </header>
 
       {loading ? (
         <div className="flex flex-col gap-3">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="h-20 bg-white rounded-2xl border border-gray-100 animate-pulse" />
-          ))}
+          {[1, 2, 3].map((i) => <Skeleton key={i} className="h-20 rounded-2xl" />)}
         </div>
       ) : notifications.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 text-center">
-          <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mb-4">
-            <Bell className="w-7 h-7 text-gray-300" strokeWidth={1.5} />
+          <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
+            <Bell className="w-7 h-7 text-muted-foreground" strokeWidth={1.5} />
           </div>
-          <p className="text-[14px] font-semibold text-gray-400">Aucune alerte</p>
-          <p className="text-[12px] text-gray-300 mt-1">Vous êtes à jour !</p>
+          <p className="text-sm font-semibold text-muted-foreground">Aucune alerte</p>
+          <p className="text-xs text-muted-foreground mt-1">Vous êtes à jour !</p>
         </div>
       ) : (
         <div className="flex flex-col gap-6">
           {Object.entries(groups).map(([day, items]) => (
             <div key={day}>
-              <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2 px-1">
-                {day}
-              </p>
+              <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider mb-2 px-1">{day}</p>
               <div className="flex flex-col gap-2">
                 {items.map((n) => {
                   const cfg = TYPE_CONFIG[n.type] ?? TYPE_CONFIG.task_assigned;
                   const { Icon } = cfg;
                   return (
-                    <button
+                    <Card
                       key={n.id}
-                      onClick={() => handleClick(n)}
-                      className={`w-full text-left bg-white rounded-2xl border p-4 flex items-start gap-3 transition-opacity active:scale-[.99] ${
-                        n.is_read ? "border-gray-100 opacity-70" : "border-[#FA7866]/20 shadow-sm"
-                      }`}
-                    >
-                      {/* Icon */}
-                      <div className={`w-10 h-10 rounded-full ${cfg.bg} flex items-center justify-center shrink-0`}>
-                        <Icon className={`w-5 h-5 ${cfg.iconColor}`} strokeWidth={1.5} />
-                      </div>
-
-                      {/* Content */}
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-start justify-between gap-2">
-                          <p className={`text-[13px] font-bold leading-snug ${n.is_read ? "text-gray-500" : "text-[#1E1E1E]"}`}>
-                            {n.title}
-                          </p>
-                          <span className="text-[11px] text-gray-400 shrink-0">{timeAgo(n.created_at)}</span>
-                        </div>
-                        <p className="text-[12px] text-gray-400 mt-0.5 leading-relaxed line-clamp-2">
-                          {n.message}
-                        </p>
-                        {n.data?.task_id && (
-                          <p className={`text-[11px] font-semibold mt-1.5 ${cfg.color}`}>
-                            Voir la tâche →
-                          </p>
-                        )}
-                      </div>
-
-                      {/* Unread dot */}
-                      {!n.is_read && (
-                        <div className="w-2 h-2 rounded-full bg-[#FA7866] mt-1 shrink-0" />
+                      className={cn(
+                        "cursor-pointer transition-all active:scale-[.99]",
+                        n.is_read ? "opacity-70" : "border-primary/20 shadow-sm"
                       )}
-                    </button>
+                      onClick={() => handleClick(n)}
+                    >
+                      <CardContent className="p-4 flex items-start gap-3">
+                        <div className={cn("w-10 h-10 rounded-full flex items-center justify-center shrink-0", cfg.iconBg)}>
+                          <Icon className={cn("w-5 h-5", cfg.iconColor)} strokeWidth={1.5} />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-start justify-between gap-2">
+                            <p className={cn("text-sm font-bold leading-snug", n.is_read ? "text-muted-foreground" : "")}>
+                              {n.title}
+                            </p>
+                            <span className="text-[11px] text-muted-foreground shrink-0">{timeAgo(n.created_at)}</span>
+                          </div>
+                          <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed line-clamp-2">{n.message}</p>
+                          {n.data?.task_id && (
+                            <p className={cn("text-[11px] font-semibold mt-1.5", cfg.linkColor)}>Voir la tâche →</p>
+                          )}
+                        </div>
+                        {!n.is_read && (
+                          <Badge className="w-2 h-2 p-0 rounded-full shrink-0 mt-1 bg-primary border-0" />
+                        )}
+                      </CardContent>
+                    </Card>
                   );
                 })}
               </div>

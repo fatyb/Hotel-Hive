@@ -36,7 +36,9 @@
       "Bash(npx shadcn@latest init -y --defaults)",
       "Bash(npx shadcn@latest add card badge dialog select input textarea tabs avatar dropdown-menu separator label switch progress skeleton toast sonner -y)",
       "Bash(npx shadcn@latest add card badge dialog select input textarea tabs avatar dropdown-menu separator label switch progress skeleton sonner -y)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git config:*)"
     ]
   }
 }

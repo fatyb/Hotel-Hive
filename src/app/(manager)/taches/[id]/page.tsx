@@ -6,51 +6,48 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { Task, TaskComment, TaskStatus, UserProfile, Department } from "@/types";
 import { ArrowLeft, MapPin, User, Clock, BedDouble, Pencil, Check, X, RefreshCw } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Separator } from "@/components/ui/separator";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-const STATUS_LABEL: Record<TaskStatus, string> = {
-  a_faire:  "À faire",
-  en_cours: "En cours",
-  terminee: "Terminée",
-  annulee:  "Annulée",
+const STATUS_CONFIG: Record<TaskStatus, { label: string; className: string }> = {
+  a_faire:  { label: "À faire",  className: "bg-secondary text-secondary-foreground border-border"    },
+  en_cours: { label: "En cours", className: "bg-blue-50 text-blue-600 border-blue-200"               },
+  terminee: { label: "Terminée", className: "bg-green-50 text-green-600 border-green-200"            },
+  annulee:  { label: "Annulée",  className: "bg-secondary text-muted-foreground border-border"       },
 };
 
-const STATUS_STYLE: Record<TaskStatus, string> = {
-  a_faire:  "bg-gray-100 text-gray-500",
-  en_cours: "bg-blue-50 text-blue-600",
-  terminee: "bg-green-50 text-green-600",
-  annulee:  "bg-gray-100 text-gray-400",
-};
-
-const PRIORITY_LABEL = { basse: "Basse", normale: "Normale", haute: "Haute" };
-const PRIORITY_STYLE = {
-  basse:   "bg-gray-100 text-gray-500",
-  normale: "bg-yellow-50 text-yellow-600",
-  haute:   "bg-red-50 text-red-500",
+const PRIORITY_CONFIG = {
+  basse:   { label: "Basse",   className: "bg-secondary text-muted-foreground border-border"   },
+  normale: { label: "Normale", className: "bg-yellow-50 text-yellow-600 border-yellow-200"    },
+  haute:   { label: "Haute",   className: "bg-destructive/10 text-destructive border-destructive/20" },
 };
 
 const DEPT_LABELS: Record<string, string> = {
-  housekeeping: "Housekeeping",
-  maintenance:  "Maintenance",
-  it:           "IT",
-  reception:    "Réception",
+  housekeeping: "Housekeeping", maintenance: "Maintenance", it: "IT", reception: "Réception",
+};
+
+const ROOM_STATUS_CONFIG: Record<string, { label: string; dotClass: string; badgeClass: string }> = {
+  disponible:  { label: "Disponible",  dotClass: "bg-green-500",  badgeClass: "bg-green-100 text-green-700 border-green-200"  },
+  occupee:     { label: "Occupée",     dotClass: "bg-blue-500",   badgeClass: "bg-blue-100 text-blue-700 border-blue-200"    },
+  nettoyage:   { label: "Nettoyage",   dotClass: "bg-amber-500",  badgeClass: "bg-amber-100 text-amber-700 border-amber-200" },
+  maintenance: { label: "Maintenance", dotClass: "bg-red-500",    badgeClass: "bg-red-100 text-red-700 border-red-200"       },
 };
 
 function formatDate(iso?: string | null) {
   if (!iso) return null;
-  return new Date(iso).toLocaleDateString("fr-FR", {
-    day: "numeric", month: "long", hour: "2-digit", minute: "2-digit",
-  });
+  return new Date(iso).toLocaleDateString("fr-FR", { day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" });
 }
 
 type RoomInfo = { number: string; status: string; floor: number; type: string };
 type TaskWithAssignee = Task & { profiles?: { full_name: string }; rooms?: RoomInfo };
-
-const ROOM_STATUS_CONFIG: Record<string, { label: string; dot: string; badge: string; text: string }> = {
-  disponible:  { label: "Disponible",  dot: "bg-green-500",  badge: "bg-green-100 dark:bg-green-900/30",  text: "text-green-700 dark:text-green-400"  },
-  occupee:     { label: "Occupée",     dot: "bg-blue-500",   badge: "bg-blue-100 dark:bg-blue-900/30",    text: "text-blue-700 dark:text-blue-400"    },
-  nettoyage:   { label: "Nettoyage",   dot: "bg-amber-500",  badge: "bg-amber-100 dark:bg-amber-900/30",  text: "text-amber-700 dark:text-amber-400"  },
-  maintenance: { label: "Maintenance", dot: "bg-red-500",    badge: "bg-red-100 dark:bg-red-900/30",      text: "text-red-700 dark:text-red-400"      },
-};
 
 export default function ManagerTaskDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -63,16 +60,15 @@ export default function ManagerTaskDetailPage() {
   const [loading,    setLoading]    = useState(true);
   const [userId,     setUserId]     = useState("");
 
-  // Edit state (recurring tasks only)
-  const [editing,     setEditing]     = useState(false);
-  const [editTitle,   setEditTitle]   = useState("");
-  const [editDesc,    setEditDesc]    = useState("");
-  const [editPrio,    setEditPrio]    = useState<"basse" | "normale" | "haute">("normale");
-  const [editDept,    setEditDept]    = useState<Department>("housekeeping");
-  const [editAssign,  setEditAssign]  = useState("");
-  const [staffList,   setStaffList]   = useState<UserProfile[]>([]);
-  const [saving,      setSaving]      = useState(false);
-  const [saveError,   setSaveError]   = useState("");
+  const [editing,    setEditing]    = useState(false);
+  const [editTitle,  setEditTitle]  = useState("");
+  const [editDesc,   setEditDesc]   = useState("");
+  const [editPrio,   setEditPrio]   = useState<"basse" | "normale" | "haute">("normale");
+  const [editDept,   setEditDept]   = useState<Department>("housekeeping");
+  const [editAssign, setEditAssign] = useState("");
+  const [staffList,  setStaffList]  = useState<UserProfile[]>([]);
+  const [saving,     setSaving]     = useState(false);
+  const [saveError,  setSaveError]  = useState("");
 
   useEffect(() => {
     async function load() {
@@ -83,41 +79,27 @@ export default function ManagerTaskDetailPage() {
       const { data: row } = await supabase
         .from("tasks")
         .select("*, profiles:assigned_to(full_name), rooms(number, status, floor, type)")
-        .eq("id", id)
-        .single();
+        .eq("id", id).single();
 
       if (row) {
         const t = row as TaskWithAssignee;
         setTask(t);
-        setEditTitle(t.title);
-        setEditDesc(t.description ?? "");
-        setEditPrio(t.priority);
-        setEditDept(t.department);
-        setEditAssign(t.assigned_to ?? "");
+        setEditTitle(t.title); setEditDesc(t.description ?? "");
+        setEditPrio(t.priority); setEditDept(t.department); setEditAssign(t.assigned_to ?? "");
       }
 
       const { data: commentRows } = await supabase
-        .from("task_comments")
-        .select("*, profiles(full_name)")
-        .eq("task_id", id)
-        .order("created_at", { ascending: true });
-
+        .from("task_comments").select("*, profiles(full_name)")
+        .eq("task_id", id).order("created_at", { ascending: true });
       if (commentRows) setComments(commentRows);
 
-      // Fetch all non-manager staff for reassignment
-      const { data: prof } = await supabase
-        .from("profiles").select("hotel_id").eq("id", user.id).single();
+      const { data: prof } = await supabase.from("profiles").select("hotel_id").eq("id", user.id).single();
       if (prof) {
-        const { data: staff } = await supabase
-          .from("profiles")
+        const { data: staff } = await supabase.from("profiles")
           .select("id, full_name, role, hotel_id, is_active")
-          .eq("hotel_id", prof.hotel_id)
-          .neq("role", "manager")
-          .eq("is_active", true)
-          .order("full_name");
+          .eq("hotel_id", prof.hotel_id).neq("role", "manager").eq("is_active", true).order("full_name");
         setStaffList((staff as UserProfile[]) ?? []);
       }
-
       setLoading(false);
     }
     load();
@@ -126,90 +108,54 @@ export default function ManagerTaskDetailPage() {
   async function handleAddComment() {
     if (!newComment.trim() || !task) return;
     setSending(true);
-    const { data } = await supabase
-      .from("task_comments")
+    const { data } = await supabase.from("task_comments")
       .insert({ task_id: id, user_id: userId, content: newComment.trim() })
-      .select("*, profiles(full_name)")
-      .single();
+      .select("*, profiles(full_name)").single();
     if (data) {
       setComments((prev) => [...prev, data]);
       if (task.assigned_to && task.assigned_to !== userId) {
         await supabase.from("notifications").insert({
-          hotel_id: task.hotel_id,
-          user_id:  task.assigned_to,
-          type:     "note_added",
-          title:    "Note ajoutée par le manager",
-          message:  newComment.trim(),
-          data:     { task_id: task.id },
+          hotel_id: task.hotel_id, user_id: task.assigned_to, type: "note_added",
+          title: "Note ajoutée par le manager", message: newComment.trim(), data: { task_id: task.id },
         });
       }
     }
-    setNewComment("");
-    setSending(false);
+    setNewComment(""); setSending(false);
   }
 
   async function handleSaveEdit() {
     if (!task || !editTitle.trim()) return;
-    setSaving(true);
-    setSaveError("");
-
-    const { error } = await supabase
-      .from("tasks")
-      .update({
-        title:       editTitle.trim(),
-        description: editDesc.trim(),
-        priority:    editPrio,
-        department:  editDept,
-        assigned_to: editAssign || task.assigned_to,
-      })
-      .eq("id", id);
-
-    if (error) {
-      setSaveError(error.message);
-      setSaving(false);
-      return;
-    }
-
-    // Notify new assignee if changed
+    setSaving(true); setSaveError("");
+    const { error } = await supabase.from("tasks").update({
+      title: editTitle.trim(), description: editDesc.trim(),
+      priority: editPrio, department: editDept, assigned_to: editAssign || task.assigned_to,
+    }).eq("id", id);
+    if (error) { setSaveError(error.message); setSaving(false); return; }
     if (editAssign && editAssign !== task.assigned_to) {
       await supabase.from("notifications").insert({
-        hotel_id: task.hotel_id,
-        user_id:  editAssign,
-        type:     "task_assigned",
-        title:    "Tâche récurrente mise à jour",
-        message:  editTitle.trim(),
-        data:     { task_id: task.id },
+        hotel_id: task.hotel_id, user_id: editAssign, type: "task_assigned",
+        title: "Tâche récurrente mise à jour", message: editTitle.trim(), data: { task_id: task.id },
       });
     }
-
-    // Refresh task
-    const { data: updated } = await supabase
-      .from("tasks")
-      .select("*, profiles:assigned_to(full_name), rooms(number, status, floor, type)")
-      .eq("id", id)
-      .single();
-
+    const { data: updated } = await supabase.from("tasks")
+      .select("*, profiles:assigned_to(full_name), rooms(number, status, floor, type)").eq("id", id).single();
     if (updated) setTask(updated as TaskWithAssignee);
-    setEditing(false);
-    setSaving(false);
+    setEditing(false); setSaving(false);
   }
 
   if (loading || !task) {
     return (
       <div className="max-w-3xl mx-auto flex flex-col gap-4">
-        <div className="h-5 w-24 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse" />
-        <div className="h-8 w-3/4 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse" />
-        <div className="h-40 bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 animate-pulse" />
+        <Skeleton className="h-5 w-24 rounded-full" />
+        <Skeleton className="h-8 w-3/4 rounded-full" />
+        <Skeleton className="h-40 rounded-2xl" />
       </div>
     );
   }
 
   return (
     <div className="max-w-3xl mx-auto">
-      <Link
-        href="/taches"
-        className="inline-flex items-center gap-1.5 text-[13px] text-gray-400 font-medium mb-6 hover:text-gray-600 dark:hover:text-gray-300"
-      >
+      <Link href="/taches" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground font-medium mb-6 hover:text-foreground transition-colors">
         <ArrowLeft className="w-4 h-4" strokeWidth={1.5} />
         Retour aux tâches
       </Link>
@@ -217,273 +163,235 @@ export default function ManagerTaskDetailPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left: task info */}
         <div className="lg:col-span-2 flex flex-col gap-4">
-
-          {/* Task summary card */}
-          <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm p-6">
-
-            {/* Header row: badges + edit button */}
-            <div className="flex items-start justify-between gap-3 mb-4">
-              <div className="flex flex-wrap gap-2">
-                {task.is_recurring && (
-                  <span className="flex items-center gap-1 text-[11px] font-bold bg-[#FFF1EF] dark:bg-[#FA7866]/10 text-[#FA7866] px-2.5 py-1 rounded-full">
-                    <RefreshCw className="w-3 h-3" strokeWidth={2} />
-                    Récurrente
-                  </span>
+          <Card>
+            <CardContent className="p-6">
+              {/* Header row */}
+              <div className="flex items-start justify-between gap-3 mb-4">
+                <div className="flex flex-wrap gap-2">
+                  {task.is_recurring && (
+                    <Badge className="gap-1 text-[11px]">
+                      <RefreshCw className="w-3 h-3" strokeWidth={2} />
+                      Récurrente
+                    </Badge>
+                  )}
+                  {task.type === "urgente" && (
+                    <Badge className="text-[11px] uppercase tracking-wide">Urgent</Badge>
+                  )}
+                  <Badge variant="outline" className={cn("text-[11px]", STATUS_CONFIG[task.status].className)}>
+                    {STATUS_CONFIG[task.status].label}
+                  </Badge>
+                  <Badge variant="outline" className={cn("text-[11px]", PRIORITY_CONFIG[task.priority].className)}>
+                    Priorité {PRIORITY_CONFIG[task.priority].label}
+                  </Badge>
+                  <Badge variant="secondary" className="text-[11px]">
+                    {DEPT_LABELS[task.department] ?? task.department}
+                  </Badge>
+                </div>
+                {task.is_recurring && !editing && (
+                  <Button variant="outline" size="sm" className="shrink-0 gap-1.5" onClick={() => setEditing(true)}>
+                    <Pencil className="w-3.5 h-3.5" strokeWidth={1.5} />
+                    Modifier
+                  </Button>
                 )}
-                {task.type === "urgente" && (
-                  <span className="text-[11px] font-bold bg-[#FFF1EF] dark:bg-[#FA7866]/10 text-[#FA7866] px-2.5 py-1 rounded-full uppercase tracking-wide">
-                    Urgent
-                  </span>
-                )}
-                <span className={`text-[11px] font-semibold px-2.5 py-1 rounded-full ${STATUS_STYLE[task.status]}`}>
-                  {STATUS_LABEL[task.status]}
-                </span>
-                <span className={`text-[11px] font-semibold px-2.5 py-1 rounded-full ${PRIORITY_STYLE[task.priority]}`}>
-                  Priorité {PRIORITY_LABEL[task.priority]}
-                </span>
-                <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400">
-                  {DEPT_LABELS[task.department] ?? task.department}
-                </span>
               </div>
 
-              {/* Edit button — only for recurring tasks */}
-              {task.is_recurring && !editing && (
-                <button
-                  onClick={() => setEditing(true)}
-                  className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 text-[12px] font-semibold text-gray-500 dark:text-gray-400 hover:border-[#FA7866]/40 hover:text-[#FA7866] transition-colors"
-                >
-                  <Pencil className="w-3.5 h-3.5" strokeWidth={1.5} />
-                  Modifier
-                </button>
-              )}
-            </div>
-
-            {/* ── View mode ── */}
-            {!editing && (
-              <>
-                <h1 className="text-[22px] font-extrabold text-[#1E1E1E] dark:text-white leading-tight">{task.title}</h1>
-
-                {task.description && (
-                  <p className="mt-3 text-[14px] text-gray-500 dark:text-gray-400 leading-relaxed">{task.description}</p>
-                )}
-
-                <div className="mt-5 pt-4 border-t border-gray-100 dark:border-gray-800 flex flex-col gap-2">
-                  {task.profiles?.full_name && (
-                    <div className="flex items-center gap-2 text-[13px] text-gray-400">
-                      <User className="w-4 h-4 shrink-0" strokeWidth={1.5} />
-                      Assigné à <span className="font-semibold text-[#1E1E1E] dark:text-white">{task.profiles.full_name}</span>
-                    </div>
+              {/* View mode */}
+              {!editing && (
+                <>
+                  <h1 className="text-[22px] font-extrabold leading-tight">{task.title}</h1>
+                  {task.description && (
+                    <p className="mt-3 text-sm text-muted-foreground leading-relaxed">{task.description}</p>
                   )}
-                  {task.location && (
-                    <div className="flex items-center gap-2 text-[13px] text-gray-400">
-                      <MapPin className="w-4 h-4 shrink-0" strokeWidth={1.5} />
-                      {task.location}
-                    </div>
-                  )}
-                  {task.due_at && (
-                    <div className="flex items-center gap-2 text-[13px] text-gray-400">
-                      <Clock className="w-4 h-4 shrink-0" strokeWidth={1.5} />
-                      Échéance : {formatDate(task.due_at)}
-                    </div>
-                  )}
-                </div>
-
-                {/* Room status */}
-                {task.rooms && (() => {
-                  const rs = ROOM_STATUS_CONFIG[task.rooms.status] ?? ROOM_STATUS_CONFIG.disponible;
-                  return (
-                    <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-800">
-                      <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">Chambre liée</p>
-                      <div className="flex items-center justify-between p-3 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700">
-                        <div className="flex items-center gap-3">
-                          <div className="w-9 h-9 rounded-xl bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 flex items-center justify-center">
-                            <BedDouble className="w-4 h-4 text-gray-500 dark:text-gray-400" strokeWidth={1.5} />
-                          </div>
-                          <div>
-                            <p className="text-[13px] font-bold text-[#1E1E1E] dark:text-white">Chambre {task.rooms.number}</p>
-                            <p className="text-[11px] text-gray-400">Étage {task.rooms.floor} · {task.rooms.type.charAt(0).toUpperCase() + task.rooms.type.slice(1)}</p>
-                          </div>
-                        </div>
-                        <span className={`flex items-center gap-1.5 text-[11px] font-bold px-2.5 py-1 rounded-full ${rs.badge} ${rs.text}`}>
-                          <span className={`w-1.5 h-1.5 rounded-full ${rs.dot}`} />
-                          {rs.label}
-                        </span>
+                  <Separator className="my-5" />
+                  <div className="flex flex-col gap-2">
+                    {task.profiles?.full_name && (
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <User className="w-4 h-4 shrink-0" strokeWidth={1.5} />
+                        Assigné à <span className="font-semibold text-foreground">{task.profiles.full_name}</span>
                       </div>
+                    )}
+                    {task.location && (
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <MapPin className="w-4 h-4 shrink-0" strokeWidth={1.5} />
+                        {task.location}
+                      </div>
+                    )}
+                    {task.due_at && (
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <Clock className="w-4 h-4 shrink-0" strokeWidth={1.5} />
+                        Échéance : {formatDate(task.due_at)}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Linked room */}
+                  {task.rooms && (() => {
+                    const rs = ROOM_STATUS_CONFIG[task.rooms.status] ?? ROOM_STATUS_CONFIG.disponible;
+                    return (
+                      <div className="mt-5 pt-4 border-t border-border">
+                        <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Chambre liée</p>
+                        <div className="flex items-center justify-between p-3 rounded-xl bg-muted/50 border border-border">
+                          <div className="flex items-center gap-3">
+                            <div className="w-9 h-9 rounded-xl bg-card border border-border flex items-center justify-center">
+                              <BedDouble className="w-4 h-4 text-muted-foreground" strokeWidth={1.5} />
+                            </div>
+                            <div>
+                              <p className="text-sm font-bold">Chambre {task.rooms.number}</p>
+                              <p className="text-[11px] text-muted-foreground">Étage {task.rooms.floor} · {task.rooms.type.charAt(0).toUpperCase() + task.rooms.type.slice(1)}</p>
+                            </div>
+                          </div>
+                          <Badge variant="outline" className={cn("text-[11px] gap-1.5", rs.badgeClass)}>
+                            <span className={cn("w-1.5 h-1.5 rounded-full", rs.dotClass)} />
+                            {rs.label}
+                          </Badge>
+                        </div>
+                      </div>
+                    );
+                  })()}
+
+                  {/* Timeline */}
+                  {(task.started_at || task.completed_at) && (
+                    <div className="mt-4 pt-4 border-t border-border flex flex-col gap-1.5">
+                      {task.started_at && (
+                        <p className="text-xs text-muted-foreground">▶ Démarré le {formatDate(task.started_at)}</p>
+                      )}
+                      {task.completed_at && (
+                        <p className="text-xs text-green-600">✓ Terminé le {formatDate(task.completed_at)}</p>
+                      )}
                     </div>
-                  );
-                })()}
+                  )}
+                </>
+              )}
 
-                {/* Timeline */}
-                {(task.started_at || task.completed_at) && (
-                  <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-800 flex flex-col gap-1.5">
-                    {task.started_at && (
-                      <p className="text-[12px] text-gray-400">▶ Démarré le {formatDate(task.started_at)}</p>
-                    )}
-                    {task.completed_at && (
-                      <p className="text-[12px] text-green-500">✓ Terminé le {formatDate(task.completed_at)}</p>
-                    )}
+              {/* Edit mode */}
+              {editing && (
+                <div className="flex flex-col gap-4">
+                  <div className="space-y-1.5">
+                    <Label>Titre</Label>
+                    <Input value={editTitle} onChange={(e) => setEditTitle(e.target.value)} />
                   </div>
-                )}
-              </>
-            )}
-
-            {/* ── Edit mode (recurring only) ── */}
-            {editing && (
-              <div className="flex flex-col gap-4">
-                <div>
-                  <label className="block text-[12px] font-semibold text-gray-500 dark:text-gray-400 mb-1.5">Titre</label>
-                  <input
-                    type="text"
-                    value={editTitle}
-                    onChange={(e) => setEditTitle(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-[13px] text-[#1E1E1E] dark:text-white focus:outline-none focus:border-[#FA7866] focus:ring-1 focus:ring-[#FA7866]/30"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-[12px] font-semibold text-gray-500 dark:text-gray-400 mb-1.5">Description</label>
-                  <textarea
-                    rows={3}
-                    value={editDesc}
-                    onChange={(e) => setEditDesc(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-[13px] text-[#1E1E1E] dark:text-white resize-none focus:outline-none focus:border-[#FA7866] focus:ring-1 focus:ring-[#FA7866]/30"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-[12px] font-semibold text-gray-500 dark:text-gray-400 mb-1.5">Priorité</label>
-                  <div className="flex gap-2">
-                    {(["basse", "normale", "haute"] as const).map((p) => (
-                      <button
-                        key={p}
-                        type="button"
-                        onClick={() => setEditPrio(p)}
-                        className={`flex-1 py-2 rounded-xl text-[12px] font-semibold border transition-colors ${
-                          editPrio === p
-                            ? "bg-[#FA7866] border-[#FA7866] text-white"
-                            : "border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:border-[#FA7866]/40"
-                        }`}
-                      >
-                        {PRIORITY_LABEL[p]}
-                      </button>
-                    ))}
+                  <div className="space-y-1.5">
+                    <Label>Description</Label>
+                    <Textarea rows={3} value={editDesc} onChange={(e) => setEditDesc(e.target.value)} className="resize-none" />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label>Priorité</Label>
+                    <div className="flex gap-2">
+                      {(["basse", "normale", "haute"] as const).map((p) => (
+                        <button
+                          key={p} type="button" onClick={() => setEditPrio(p)}
+                          className={cn(
+                            "flex-1 py-2 rounded-xl text-xs font-semibold border transition-colors",
+                            editPrio === p ? "bg-primary text-primary-foreground border-primary" : "bg-card text-muted-foreground border-border hover:border-muted-foreground"
+                          )}
+                        >
+                          {PRIORITY_CONFIG[p].label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label>Département</Label>
+                    <Select value={editDept} onValueChange={(v) => setEditDept(v as Department)}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="housekeeping">Housekeeping</SelectItem>
+                        <SelectItem value="maintenance">Maintenance</SelectItem>
+                        <SelectItem value="it">IT</SelectItem>
+                        <SelectItem value="reception">Réception</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label>Assigné à</Label>
+                    <Select value={editAssign} onValueChange={setEditAssign}>
+                      <SelectTrigger><SelectValue placeholder="— Choisir un membre —" /></SelectTrigger>
+                      <SelectContent>
+                        {staffList.map((s) => (
+                          <SelectItem key={s.id} value={s.id}>{s.full_name} ({DEPT_LABELS[s.role] ?? s.role})</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  {saveError && <p className="text-xs text-destructive font-medium">{saveError}</p>}
+                  <div className="flex gap-2 pt-2">
+                    <Button className="flex-1 gap-2" onClick={handleSaveEdit} disabled={saving || !editTitle.trim()}>
+                      {saving
+                        ? <><div className="w-4 h-4 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" /> Enregistrement…</>
+                        : <><Check className="w-4 h-4" strokeWidth={2} /> Enregistrer</>
+                      }
+                    </Button>
+                    <Button variant="outline" size="icon" onClick={() => { setEditing(false); setSaveError(""); }} disabled={saving}>
+                      <X className="w-4 h-4" strokeWidth={2} />
+                    </Button>
                   </div>
                 </div>
-
-                <div>
-                  <label className="block text-[12px] font-semibold text-gray-500 dark:text-gray-400 mb-1.5">Département</label>
-                  <select
-                    value={editDept}
-                    onChange={(e) => setEditDept(e.target.value as Department)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-[13px] text-[#1E1E1E] dark:text-white focus:outline-none focus:border-[#FA7866]"
-                  >
-                    <option value="housekeeping">Housekeeping</option>
-                    <option value="maintenance">Maintenance</option>
-                    <option value="it">IT</option>
-                    <option value="reception">Réception</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-[12px] font-semibold text-gray-500 dark:text-gray-400 mb-1.5">Assigné à</label>
-                  <select
-                    value={editAssign}
-                    onChange={(e) => setEditAssign(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-[13px] text-[#1E1E1E] dark:text-white focus:outline-none focus:border-[#FA7866]"
-                  >
-                    <option value="">— Choisir un membre —</option>
-                    {staffList.map((s) => (
-                      <option key={s.id} value={s.id}>{s.full_name} ({DEPT_LABELS[s.role] ?? s.role})</option>
-                    ))}
-                  </select>
-                </div>
-
-                {saveError && (
-                  <p className="text-[12px] text-red-500 font-medium">{saveError}</p>
-                )}
-
-                <div className="flex gap-2 pt-2">
-                  <button
-                    onClick={handleSaveEdit}
-                    disabled={saving || !editTitle.trim()}
-                    className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-[#FA7866] hover:bg-[#E55C49] text-white text-[13px] font-bold transition-colors disabled:opacity-40"
-                  >
-                    {saving
-                      ? <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Enregistrement…</>
-                      : <><Check className="w-4 h-4" strokeWidth={2} /> Enregistrer</>
-                    }
-                  </button>
-                  <button
-                    onClick={() => { setEditing(false); setSaveError(""); }}
-                    disabled={saving}
-                    className="px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-[13px] font-semibold text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
-                  >
-                    <X className="w-4 h-4" strokeWidth={2} />
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
+              )}
+            </CardContent>
+          </Card>
 
           {/* Photos */}
           {!editing && (
-            <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm p-6">
-              <h2 className="text-[15px] font-bold text-[#1E1E1E] dark:text-white mb-4">📸 Photos</h2>
-              {!task.photos || task.photos.length === 0 ? (
-                <p className="text-[13px] text-gray-300 dark:text-gray-600">Aucune photo ajoutée par le staff.</p>
-              ) : (
-                <div className="grid grid-cols-3 gap-2">
-                  {task.photos.map((url, i) => (
-                    <a key={i} href={url} target="_blank" rel="noopener noreferrer">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={url} alt={`Photo ${i + 1}`} className="w-full aspect-square object-cover rounded-xl border border-gray-100 dark:border-gray-800 hover:opacity-90 transition-opacity" />
-                    </a>
-                  ))}
-                </div>
-              )}
-            </div>
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-[15px]">📸 Photos</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {!task.photos || task.photos.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">Aucune photo ajoutée par le staff.</p>
+                ) : (
+                  <div className="grid grid-cols-3 gap-2">
+                    {task.photos.map((url, i) => (
+                      <a key={i} href={url} target="_blank" rel="noopener noreferrer">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={url} alt={`Photo ${i + 1}`} className="w-full aspect-square object-cover rounded-xl border border-border hover:opacity-90 transition-opacity" />
+                      </a>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           )}
         </div>
 
         {/* Right: comments */}
-        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm p-6 flex flex-col">
-          <h2 className="text-[15px] font-bold text-[#1E1E1E] dark:text-white mb-4">💬 Notes</h2>
-
-          <div className="flex-1 flex flex-col gap-3 mb-4">
+        <Card className="flex flex-col">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-[15px]">💬 Notes</CardTitle>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-3 flex-1">
             {comments.length === 0 ? (
-              <p className="text-[13px] text-gray-300 dark:text-gray-600">Aucune note pour le moment.</p>
+              <p className="text-sm text-muted-foreground">Aucune note pour le moment.</p>
             ) : (
-              comments.map((c) => (
-                <div key={c.id} className="bg-gray-50 dark:bg-gray-800 rounded-xl p-3">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-[12px] font-semibold text-[#1E1E1E] dark:text-white">
-                      {c.profiles?.full_name ?? "Inconnu"}
-                    </span>
-                    <span className="text-[11px] text-gray-400">{formatDate(c.created_at ?? undefined)}</span>
+              <div className="flex flex-col gap-3">
+                {comments.map((c) => (
+                  <div key={c.id} className="bg-muted/50 rounded-xl p-3">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-xs font-semibold">{c.profiles?.full_name ?? "Inconnu"}</span>
+                      <span className="text-[11px] text-muted-foreground">{formatDate(c.created_at ?? undefined)}</span>
+                    </div>
+                    <p className="text-sm text-muted-foreground leading-relaxed">{c.content}</p>
                   </div>
-                  <p className="text-[13px] text-gray-600 dark:text-gray-400 leading-relaxed">{c.content}</p>
-                </div>
-              ))
+                ))}
+              </div>
             )}
-          </div>
-
-          <div className="flex flex-col gap-2 pt-4 border-t border-gray-100 dark:border-gray-800">
-            <textarea
+            <Separator className="my-1" />
+            <Textarea
               rows={3}
-              className="w-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-xl p-3 text-[13px] text-[#1E1E1E] dark:text-white resize-none focus:outline-none focus:ring-1 focus:ring-[#FA7866]/40 placeholder:text-gray-300 dark:placeholder:text-gray-600"
               placeholder="Ajouter une note..."
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
+              className="resize-none"
             />
-            <button
+            <Button
+              className="w-full font-bold"
               onClick={handleAddComment}
               disabled={!newComment.trim() || sending}
-              className="w-full py-2.5 rounded-xl bg-[#FA7866] text-white text-[13px] font-bold disabled:opacity-30 hover:bg-[#E55C49] transition-colors"
             >
-              {sending ? "Envoi..." : "Ajouter"}
-            </button>
-          </div>
-        </div>
+              {sending ? "Envoi…" : "Ajouter"}
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
