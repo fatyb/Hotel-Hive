@@ -180,7 +180,7 @@ export default function EquipePage() {
   const [error,      setError]      = useState("");
 
   // PIN success dialog
-  const [pinDialog, setPinDialog] = useState<{ name: string; email: string; pin: string; temp_password: string } | null>(null);
+  const [pinDialog, setPinDialog] = useState<{ name: string; email: string; pin: string; temp_password: string; email_sent: boolean } | null>(null);
 
   // Details dialog
   const [detailMember, setDetailMember] = useState<StaffMember | null>(null);
@@ -262,7 +262,7 @@ export default function EquipePage() {
       } else {
         setInviteOpen(false);
         setForm(EMPTY_FORM);
-        setPinDialog({ name: form.full_name, email: form.email, pin: json.pin, temp_password: json.temp_password });
+        setPinDialog({ name: form.full_name, email: form.email, pin: json.pin, temp_password: json.temp_password, email_sent: !!json.email_sent });
         setLoading(true);
         await loadMembers();
       }
@@ -721,9 +721,15 @@ export default function EquipePage() {
             </div>
             <div>
               <p className="font-bold text-lg">Membre créé !</p>
-              <p className="text-sm text-muted-foreground mt-1">
-                Compte créé pour <strong>{pinDialog?.name}</strong>
-              </p>
+              {pinDialog?.email_sent ? (
+                <p className="text-sm text-emerald-600 dark:text-emerald-400 mt-1">
+                  ✉️ Email envoyé à <strong>{pinDialog.email}</strong>
+                </p>
+              ) : (
+                <p className="text-sm text-muted-foreground mt-1">
+                  Compte créé pour <strong>{pinDialog?.name}</strong> — partagez les identifiants ci-dessous
+                </p>
+              )}
             </div>
 
             {/* Temp password */}
