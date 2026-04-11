@@ -304,7 +304,7 @@ export default function ManagerTaskDetailPage() {
                   </div>
                   <div className="space-y-1.5">
                     <Label>Assigné à</Label>
-                    <Select value={editAssign} onValueChange={setEditAssign}>
+                    <Select value={editAssign} onValueChange={(v) => setEditAssign(v ?? "")}>
                       <SelectTrigger><SelectValue placeholder="— Choisir un membre —" /></SelectTrigger>
                       <SelectContent>
                         {staffList.map((s) => (

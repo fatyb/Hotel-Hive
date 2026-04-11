@@ -63,7 +63,7 @@ export default function DashboardPage() {
       if (!user) return;
 
       const { data: prof } = await supabase.from("profiles").select("hotels(name)").eq("id", user.id).single();
-      if (prof) setHotelName((prof as { hotels?: { name: string } }).hotels?.name ?? "");
+      if (prof) setHotelName(((prof as unknown) as { hotels?: { name: string } }).hotels?.name ?? "");
 
       const today = new Date();
       today.setHours(0, 0, 0, 0);

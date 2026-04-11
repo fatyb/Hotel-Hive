@@ -362,7 +362,7 @@ export default function HotelPage() {
                 </div>
                 <div className="space-y-1.5">
                   <Label>Fuseau horaire</Label>
-                  <Select value={editTimezone} onValueChange={setEditTimezone}>
+                  <Select value={editTimezone} onValueChange={(v) => setEditTimezone(v ?? "")}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
                       {TIMEZONES.map((tz) => (

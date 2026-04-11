@@ -562,7 +562,7 @@ export default function TachesPage() {
 
             <div className="space-y-1.5">
               <Label>Assigné à *</Label>
-              <Select value={newTask.assigned_to} onValueChange={(v) => setNewTask({ ...newTask, assigned_to: v })}>
+              <Select value={newTask.assigned_to} onValueChange={(v) => setNewTask({ ...newTask, assigned_to: v ?? "" })}>
                 <SelectTrigger><SelectValue placeholder="Choisir un membre…" /></SelectTrigger>
                 <SelectContent>
                   {staff.map((s) => (

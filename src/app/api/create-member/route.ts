@@ -9,7 +9,7 @@ export async function POST(req: NextRequest) {
   try {
     const {
       email, full_name, role, hotel_id,
-      phone_number, assigned_floor, shift_type, working_hours,
+      phone_number, assigned_floors, shift_type, working_hours,
     } = await req.json();
 
     if (!email || !full_name || !role || !hotel_id) {
@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
 
     const pin = generatePIN();
 
-    // Send invite email (Supabase sends a magic link)
+    // Send invite email — Supabase sends a magic link to the staff member
     const { data: inviteData, error: inviteError } = await supabase.auth.admin.inviteUserByEmail(email, {
       data: { full_name },
       redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"}/login`,
@@ -45,14 +45,15 @@ export async function POST(req: NextRequest) {
       .from("profiles")
       .update({
         full_name,
+        email,
         role,
         hotel_id,
-        phone_number:   phone_number   || null,
-        assigned_floor: assigned_floor || null,
-        shift_type:     shift_type     || null,
-        working_hours:  working_hours  || null,
-        pin_code:       pin,
-        is_active:      true,
+        phone_number:    phone_number    || null,
+        assigned_floors: assigned_floors || "",
+        shift_type:      shift_type      || null,
+        working_hours:   working_hours   || null,
+        pin_code:        pin,
+        is_active:       true,
       })
       .eq("id", inviteData.user.id);
 

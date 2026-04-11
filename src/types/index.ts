@@ -65,12 +65,13 @@ export type UserProfile = {
   id: string;
   hotel_id: string;
   full_name: string;
+  email?: string;
   role: UserRole;
   avatar_url?: string;
   is_active: boolean;
   push_token?: string;
   phone_number?: string;
-  assigned_floor?: number;
+  assigned_floors?: string;  // comma-separated e.g. "1,2,3"
   shift_type?: ShiftType;
   working_hours?: string;
   pin_code?: string;
