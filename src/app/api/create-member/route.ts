@@ -5,6 +5,13 @@ function generatePIN(): string {
   return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
+function generateTempPassword(): string {
+  const chars = "ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789";
+  let pwd = "";
+  for (let i = 0; i < 10; i++) pwd += chars[Math.floor(Math.random() * chars.length)];
+  return pwd;
+}
+
 export async function POST(req: NextRequest) {
   try {
     const {
@@ -28,16 +35,19 @@ export async function POST(req: NextRequest) {
       process.env.SUPABASE_SERVICE_ROLE_KEY
     );
 
-    const pin = generatePIN();
+    const pin      = generatePIN();
+    const tempPwd  = generateTempPassword();
 
-    // Send invite email — Supabase sends a magic link to the staff member
-    const { data: inviteData, error: inviteError } = await supabase.auth.admin.inviteUserByEmail(email, {
-      data: { full_name },
-      redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"}/login`,
+    // Create user directly — no email invite, no rate limit
+    const { data: userData, error: userError } = await supabase.auth.admin.createUser({
+      email,
+      password: tempPwd,
+      email_confirm: true,          // mark email as confirmed immediately
+      user_metadata: { full_name },
     });
 
-    if (inviteError) {
-      return NextResponse.json({ error: inviteError.message }, { status: 400 });
+    if (userError) {
+      return NextResponse.json({ error: userError.message }, { status: 400 });
     }
 
     // Update the auto-created profile with all fields
@@ -55,13 +65,13 @@ export async function POST(req: NextRequest) {
         pin_code:        pin,
         is_active:       true,
       })
-      .eq("id", inviteData.user.id);
+      .eq("id", userData.user.id);
 
     if (profileError) {
       return NextResponse.json({ error: profileError.message }, { status: 400 });
     }
 
-    return NextResponse.json({ success: true, pin, user_id: inviteData.user.id });
+    return NextResponse.json({ success: true, pin, temp_password: tempPwd, user_id: userData.user.id });
   } catch {
     return NextResponse.json({ error: "Erreur serveur inattendue." }, { status: 500 });
   }

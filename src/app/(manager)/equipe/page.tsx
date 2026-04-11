@@ -180,7 +180,7 @@ export default function EquipePage() {
   const [error,      setError]      = useState("");
 
   // PIN success dialog
-  const [pinDialog, setPinDialog] = useState<{ name: string; email: string; pin: string } | null>(null);
+  const [pinDialog, setPinDialog] = useState<{ name: string; email: string; pin: string; temp_password: string } | null>(null);
 
   // Details dialog
   const [detailMember, setDetailMember] = useState<StaffMember | null>(null);
@@ -262,7 +262,7 @@ export default function EquipePage() {
       } else {
         setInviteOpen(false);
         setForm(EMPTY_FORM);
-        setPinDialog({ name: form.full_name, email: form.email, pin: json.pin });
+        setPinDialog({ name: form.full_name, email: form.email, pin: json.pin, temp_password: json.temp_password });
         setLoading(true);
         await loadMembers();
       }
@@ -714,26 +714,51 @@ export default function EquipePage() {
 
       {/* ═══════ PIN SUCCESS ═══════ */}
       <Dialog open={!!pinDialog} onOpenChange={o => !o && setPinDialog(null)}>
-        <DialogContent className="max-w-sm text-center">
-          <div className="flex flex-col items-center gap-4 py-2">
+        <DialogContent className="max-w-sm">
+          <div className="flex flex-col items-center gap-4 py-2 text-center">
             <div className="w-14 h-14 rounded-full bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center">
               <CheckCircle className="w-7 h-7 text-emerald-500" />
             </div>
             <div>
-              <p className="font-bold text-lg">Invitation envoyée !</p>
-              <p className="text-sm text-muted-foreground mt-1">Email envoyé à <strong>{pinDialog?.email}</strong></p>
+              <p className="font-bold text-lg">Membre créé !</p>
+              <p className="text-sm text-muted-foreground mt-1">
+                Compte créé pour <strong>{pinDialog?.name}</strong>
+              </p>
             </div>
-            <div className="w-full p-4 rounded-2xl bg-muted border border-border">
+
+            {/* Temp password */}
+            <div className="w-full p-4 rounded-2xl bg-muted border border-border text-left space-y-1">
+              <p className="text-xs text-muted-foreground font-semibold flex items-center gap-1.5">
+                <Mail className="w-3.5 h-3.5" />
+                Identifiants de connexion
+              </p>
+              <p className="text-xs text-muted-foreground">Email : <span className="font-mono font-bold text-foreground">{pinDialog?.email}</span></p>
+              <div className="flex items-center justify-between gap-2 mt-1">
+                <p className="text-xs text-muted-foreground">Mot de passe temporaire :</p>
+                <div className="flex items-center gap-1">
+                  <span className="font-mono font-bold text-foreground text-sm tracking-wide">{pinDialog?.temp_password}</span>
+                  {pinDialog && <CopyBtn value={pinDialog.temp_password} />}
+                </div>
+              </div>
+              <p className="text-[10px] text-amber-600 dark:text-amber-400 mt-2 flex items-center gap-1">
+                <Shield className="w-3 h-3 shrink-0" />
+                Communiquez ces identifiants en main propre au membre
+              </p>
+            </div>
+
+            {/* PIN */}
+            <div className="w-full p-4 rounded-2xl bg-primary/5 border border-primary/20">
               <p className="text-xs text-muted-foreground mb-2 flex items-center justify-center gap-1.5">
-                <Shield className="w-3.5 h-3.5" />
-                Code PIN de {pinDialog?.name?.split(" ")[0]}
+                <Shield className="w-3.5 h-3.5 text-primary" />
+                Code PIN kiosk de {pinDialog?.name?.split(" ")[0]}
               </p>
               <div className="flex items-center justify-center gap-3">
                 <p className="text-4xl font-extrabold tracking-[0.3em] font-mono text-primary">{pinDialog?.pin}</p>
                 {pinDialog && <CopyBtn value={pinDialog.pin} />}
               </div>
-              <p className="text-[10px] text-muted-foreground mt-2">Communiquez ce code pour l'accès kiosk</p>
+              <p className="text-[10px] text-muted-foreground mt-2">Pour l'accès kiosk staff</p>
             </div>
+
             <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90" onClick={() => setPinDialog(null)}>
               Fermer
             </Button>
