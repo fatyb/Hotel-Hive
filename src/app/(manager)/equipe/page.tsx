@@ -180,7 +180,7 @@ export default function EquipePage() {
   const [error,      setError]      = useState("");
 
   // PIN success dialog
-  const [pinDialog, setPinDialog] = useState<{ name: string; email: string; pin: string; temp_password: string; email_sent: boolean } | null>(null);
+  const [pinDialog, setPinDialog] = useState<{ name: string; email: string; pin: string; temp_password: string; email_sent: boolean; email_error?: string } | null>(null);
 
   // Details dialog
   const [detailMember, setDetailMember] = useState<StaffMember | null>(null);
@@ -262,7 +262,7 @@ export default function EquipePage() {
       } else {
         setInviteOpen(false);
         setForm(EMPTY_FORM);
-        setPinDialog({ name: form.full_name, email: form.email, pin: json.pin, temp_password: json.temp_password, email_sent: !!json.email_sent });
+        setPinDialog({ name: form.full_name, email: form.email, pin: json.pin, temp_password: json.temp_password, email_sent: !!json.email_sent, email_error: json.email_error });
         setLoading(true);
         await loadMembers();
       }
@@ -726,9 +726,16 @@ export default function EquipePage() {
                   ✉️ Email envoyé à <strong>{pinDialog.email}</strong>
                 </p>
               ) : (
-                <p className="text-sm text-muted-foreground mt-1">
-                  Compte créé pour <strong>{pinDialog?.name}</strong> — partagez les identifiants ci-dessous
-                </p>
+                <div className="mt-1 space-y-1">
+                  <p className="text-sm text-muted-foreground">
+                    Compte créé pour <strong>{pinDialog?.name}</strong>
+                  </p>
+                  {pinDialog?.email_error && (
+                    <p className="text-xs text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 px-2 py-1 rounded-lg">
+                      ⚠️ Email non envoyé : {pinDialog.email_error}
+                    </p>
+                  )}
+                </div>
               )}
             </div>
 

@@ -214,19 +214,33 @@ export async function POST(req: NextRequest) {
     // 4. Send branded welcome email via Resend
     const app_url = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
+    let email_sent = false;
+    let email_error = "";
+
     if (process.env.RESEND_API_KEY) {
       try {
         const resend = new Resend(process.env.RESEND_API_KEY);
-        await resend.emails.send({
+        const { data: mailData, error: mailErr } = await resend.emails.send({
           from: "HotelHive <onboarding@resend.dev>",
           to: email,
           subject: `Bienvenue dans l'équipe ${hotel_name} — HotelHive`,
           html: buildWelcomeEmail({ full_name, email, temp_password: tempPwd, pin, hotel_name, app_url }),
         });
+
+        if (mailErr) {
+          email_error = mailErr.message;
+          console.error("❌ Resend error:", mailErr);
+        } else {
+          email_sent = true;
+          console.log("✅ Email sent, id:", mailData?.id);
+        }
       } catch (mailErr) {
-        // Email failure is non-fatal — credentials still shown in UI
-        console.error("Resend error:", mailErr);
+        email_error = String(mailErr);
+        console.error("❌ Resend exception:", mailErr);
       }
+    } else {
+      email_error = "RESEND_API_KEY not set";
+      console.warn("⚠️  RESEND_API_KEY is missing");
     }
 
     return NextResponse.json({
@@ -234,7 +248,8 @@ export async function POST(req: NextRequest) {
       pin,
       temp_password: tempPwd,
       user_id: userData.user.id,
-      email_sent: !!process.env.RESEND_API_KEY,
+      email_sent,
+      email_error: email_error || undefined,
     });
   } catch {
     return NextResponse.json({ error: "Erreur serveur inattendue." }, { status: 500 });
