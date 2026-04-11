@@ -223,31 +223,55 @@ export default function EquipePage() {
   }, [loadMembers]);
 
   // ── Invite ────────────────────────────────────────────────────────────────
-  async function handleInvite(e: React.FormEvent) {
-    e.preventDefault();
-    if (!form.full_name.trim() || !form.email.trim()) { setError("Nom et email sont obligatoires."); return; }
-    setSaving(true); setError("");
-
-    const phone_number = form.phone ? `${form.country_code} ${form.phone}` : "";
-    const assigned_floors = form.assigned_floors.join(",");
-    const working_hours = form.working_hours === "custom" ? form.custom_hours : form.working_hours;
-
-    const res  = await fetch("/api/create-member", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email: form.email, full_name: form.full_name, role: form.role, hotel_id: hotelId, phone_number, assigned_floors, shift_type: form.shift_type, working_hours }),
-    });
-    const json = await res.json();
-
-    if (!res.ok) { setError(json.error ?? "Erreur lors de l'invitation."); }
-    else {
-      setInviteOpen(false);
-      setForm(EMPTY_FORM);
-      setPinDialog({ name: form.full_name, email: form.email, pin: json.pin });
-      setLoading(true);
-      await loadMembers();
+  async function handleInvite(e?: React.FormEvent | React.MouseEvent) {
+    e?.preventDefault();
+    if (!form.full_name.trim() || !form.email.trim()) {
+      setError("Nom et email sont obligatoires.");
+      return;
     }
-    setSaving(false);
+    if (!hotelId) {
+      setError("Impossible de récupérer l'hôtel. Rechargez la page.");
+      return;
+    }
+    setSaving(true);
+    setError("");
+
+    try {
+      const phone_number = form.phone ? `${form.country_code} ${form.phone}` : "";
+      const assigned_floors = form.assigned_floors.join(",");
+      const working_hours = form.working_hours === "custom" ? form.custom_hours : form.working_hours;
+
+      const res  = await fetch("/api/create-member", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: form.email,
+          full_name: form.full_name,
+          role: form.role,
+          hotel_id: hotelId,
+          phone_number,
+          assigned_floors,
+          shift_type: form.shift_type,
+          working_hours,
+        }),
+      });
+      const json = await res.json();
+
+      if (!res.ok) {
+        setError(json.error ?? "Erreur lors de l'invitation.");
+      } else {
+        setInviteOpen(false);
+        setForm(EMPTY_FORM);
+        setPinDialog({ name: form.full_name, email: form.email, pin: json.pin });
+        setLoading(true);
+        await loadMembers();
+      }
+    } catch (err) {
+      setError("Erreur réseau. Vérifiez votre connexion.");
+      console.error("handleInvite error:", err);
+    } finally {
+      setSaving(false);
+    }
   }
 
   // ── Toggle active ─────────────────────────────────────────────────────────
@@ -538,13 +562,13 @@ export default function EquipePage() {
       {/* ═══════ INVITE DIALOG ═══════ */}
       <Dialog open={inviteOpen} onOpenChange={o => { setInviteOpen(o); if (!o) setError(""); }}>
         <DialogContent className="max-w-lg max-h-[92vh] overflow-hidden flex flex-col p-0">
+          <form onSubmit={handleInvite} className="flex flex-col min-h-0 flex-1">
           <DialogHeader className="px-6 pt-6 pb-4 border-b border-border shrink-0">
             <DialogTitle className="flex items-center gap-2"><Mail className="w-5 h-5 text-primary" />Inviter un membre</DialogTitle>
             <DialogDescription>Un email avec un lien d'activation sera envoyé automatiquement.</DialogDescription>
           </DialogHeader>
 
-          <form onSubmit={handleInvite} className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
-            {error && <div className="text-sm text-destructive bg-destructive/10 px-3 py-2 rounded-lg">{error}</div>}
+          <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
 
             {/* Preview */}
             <div className="flex items-center gap-3 p-3 bg-muted rounded-xl">
@@ -665,17 +689,26 @@ export default function EquipePage() {
                 Un <strong>code PIN à 6 chiffres</strong> sera généré automatiquement après la création. Partagez-le avec le membre pour l'accès kiosk.
               </p>
             </div>
-          </form>
-
-          <div className="px-6 py-4 border-t border-border flex justify-end gap-2 shrink-0">
-            <Button variant="outline" type="button" onClick={() => setInviteOpen(false)}>Annuler</Button>
-            <Button onClick={handleInvite} disabled={saving || !form.full_name.trim() || !form.email.trim()}
-              className="bg-primary text-primary-foreground hover:bg-primary/90 gap-2 min-w-[130px]">
-              {saving
-                ? <><span className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />Envoi...</>
-                : <><Mail className="w-4 h-4" />Envoyer l'invitation</>}
-            </Button>
           </div>
+
+          <div className="px-6 py-4 border-t border-border shrink-0 space-y-3">
+            {error && (
+              <div className="text-sm text-destructive bg-destructive/10 px-3 py-2 rounded-lg flex items-center gap-2">
+                <X className="w-4 h-4 shrink-0" />
+                {error}
+              </div>
+            )}
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" type="button" onClick={() => setInviteOpen(false)}>Annuler</Button>
+              <Button type="submit" disabled={saving || !form.full_name.trim() || !form.email.trim()}
+                className="bg-primary text-primary-foreground hover:bg-primary/90 gap-2 min-w-[130px]">
+                {saving
+                  ? <><span className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />Envoi...</>
+                  : <><Mail className="w-4 h-4" />Envoyer l'invitation</>}
+              </Button>
+            </div>
+          </div>
+          </form>
         </DialogContent>
       </Dialog>
 
