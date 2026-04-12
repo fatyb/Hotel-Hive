@@ -190,22 +190,31 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: userError.message }, { status: 400 });
     }
 
-    // 3. Update auto-created profile
-    const { error: profileError } = await supabase
-      .from("profiles")
-      .update({
-        full_name,
-        email,
-        role,
-        hotel_id,
-        phone_number:    phone_number    || null,
-        assigned_floors: assigned_floors || "",
-        shift_type:      shift_type      || null,
-        working_hours:   working_hours   || null,
-        pin_code:        pin,
-        is_active:       true,
-      })
-      .eq("id", userData.user.id);
+    // 3. Upsert profile — works even if the trigger hasn't run yet
+    // Retry up to 3 times with a short delay (trigger may be async)
+    let profileError = null;
+    for (let attempt = 0; attempt < 3; attempt++) {
+      if (attempt > 0) await new Promise(r => setTimeout(r, 500));
+
+      const { error } = await supabase
+        .from("profiles")
+        .upsert({
+          id:              userData.user.id,
+          full_name,
+          email,
+          role,
+          hotel_id,
+          phone_number:    phone_number    || null,
+          assigned_floors: assigned_floors || "",
+          shift_type:      shift_type      || null,
+          working_hours:   working_hours   || null,
+          pin_code:        pin,
+          is_active:       true,
+        }, { onConflict: "id" });
+
+      profileError = error;
+      if (!error) break;
+    }
 
     if (profileError) {
       return NextResponse.json({ error: profileError.message }, { status: 400 });

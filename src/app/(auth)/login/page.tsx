@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Logo } from "@/components/ui/Logo";
 import { Button } from "@/components/ui/button";
@@ -9,14 +9,24 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
-export default function LoginPage() {
-  const [email, setEmail]       = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError]       = useState("");
-  const [loading, setLoading]   = useState(false);
-
+function LoginForm() {
+  const params   = useSearchParams();
   const router   = useRouter();
   const supabase = createClient();
+
+  const [email,    setEmail]    = useState(params.get("email") ?? "");
+  const [password, setPassword] = useState("");
+  const [error,    setError]    = useState("");
+  const [loading,  setLoading]  = useState(false);
+
+  // If email came from invite link, focus the password field
+  const fromInvite = !!params.get("email");
+
+  useEffect(() => {
+    if (fromInvite) {
+      document.getElementById("password")?.focus();
+    }
+  }, [fromInvite]);
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
@@ -52,7 +62,11 @@ export default function LoginPage() {
         <Card>
           <CardHeader>
             <CardTitle className="text-xl">Connexion</CardTitle>
-            <CardDescription>Accédez à votre espace de travail.</CardDescription>
+            <CardDescription>
+              {fromInvite
+                ? "Utilisez votre mot de passe temporaire pour accéder à votre espace."
+                : "Accédez à votre espace de travail."}
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleLogin} className="flex flex-col gap-4">
@@ -65,11 +79,15 @@ export default function LoginPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="vous@hotel.com"
+                  readOnly={fromInvite}
+                  className={fromInvite ? "bg-muted text-muted-foreground" : ""}
                 />
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <Label htmlFor="password">Mot de passe</Label>
+                <Label htmlFor="password">
+                  {fromInvite ? "Mot de passe temporaire" : "Mot de passe"}
+                </Label>
                 <Input
                   id="password"
                   type="password"
@@ -77,7 +95,13 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
+                  autoFocus={fromInvite}
                 />
+                {fromInvite && (
+                  <p className="text-xs text-muted-foreground">
+                    Votre mot de passe temporaire se trouve dans l&apos;email de bienvenue.
+                  </p>
+                )}
               </div>
 
               {error && (
@@ -98,5 +122,17 @@ export default function LoginPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    }>
+      <LoginForm />
+    </Suspense>
   );
 }
