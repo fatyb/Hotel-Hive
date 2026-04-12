@@ -32,7 +32,7 @@ function buildWelcomeEmail({
   const first = full_name.split(" ")[0];
   const loginUrl = `${app_url}/bienvenue?email=${encodeURIComponent(email)}`;
   const pinDigits = pin.split("").map(d =>
-    `<span style="display:inline-flex;align-items:center;justify-content:center;width:44px;height:56px;background:#fff;border:2px solid #FA7866;border-radius:10px;font-size:28px;font-weight:900;color:#FA7866;margin:0 3px;font-family:monospace">${d}</span>`
+    `<span style="display:inline-flex;align-items:center;justify-content:center;width:44px;height:56px;background:#fff;border:2px solid #A4F5A6;border-radius:10px;font-size:28px;font-weight:900;color:#A4F5A6;margin:0 3px;font-family:monospace">${d}</span>`
   ).join("");
 
   return `<!DOCTYPE html>
@@ -45,7 +45,7 @@ function buildWelcomeEmail({
 
         <!-- Header -->
         <tr>
-          <td style="background:linear-gradient(135deg,#FA7866 0%,#f95e48 100%);padding:36px 40px;text-align:center">
+          <td style="background:linear-gradient(135deg,#A4F5A6 0%,#6FCF71 100%);padding:36px 40px;text-align:center">
             <p style="margin:0 0 4px 0;font-size:28px;font-weight:900;color:#fff;letter-spacing:-0.5px">🏨 HotelHive</p>
             <p style="margin:0;font-size:14px;color:rgba(255,255,255,0.8)">${hotel_name}</p>
           </td>
@@ -75,7 +75,7 @@ function buildWelcomeEmail({
                     </tr>
                     <tr>
                       <td style="padding:6px 0;font-size:13px;color:#888">Mot de passe temp.</td>
-                      <td style="padding:6px 0;font-size:15px;font-weight:800;color:#FA7866;font-family:monospace;letter-spacing:1px">${temp_password}</td>
+                      <td style="padding:6px 0;font-size:15px;font-weight:800;color:#1E7B20;font-family:monospace;letter-spacing:1px">${temp_password}</td>
                     </tr>
                   </table>
                 </td>
@@ -102,24 +102,24 @@ function buildWelcomeEmail({
         <tr>
           <td style="padding:32px 40px;text-align:center">
             <a href="${loginUrl}"
-               style="display:inline-block;background:#FA7866;color:#fff;text-decoration:none;font-size:15px;font-weight:700;padding:14px 36px;border-radius:12px;letter-spacing:0.2px">
+               style="display:inline-block;background:#A4F5A6;color:#222222;text-decoration:none;font-size:15px;font-weight:700;padding:14px 36px;border-radius:12px;letter-spacing:0.2px">
               Accéder à l'application →
             </a>
-            <p style="margin:16px 0 0;font-size:12px;color:#aaa">Ou copiez ce lien : <span style="color:#FA7866">${loginUrl}</span></p>
+            <p style="margin:16px 0 0;font-size:12px;color:#aaa">Ou copiez ce lien : <span style="color:#A4F5A6">${loginUrl}</span></p>
           </td>
         </tr>
 
         <!-- Steps -->
         <tr>
           <td style="padding:0 40px 32px">
-            <table width="100%" cellpadding="0" cellspacing="0" style="background:#fff8f7;border:1.5px solid #fde8e5;border-radius:14px">
+            <table width="100%" cellpadding="0" cellspacing="0" style="background:#f7faf7;border:1.5px solid #D4DCD3;border-radius:14px">
               <tr><td style="padding:20px 24px">
-                <p style="margin:0 0 14px;font-size:13px;font-weight:700;color:#FA7866">Comment commencer ?</p>
+                <p style="margin:0 0 14px;font-size:13px;font-weight:700;color:#A4F5A6">Comment commencer ?</p>
                 <table cellpadding="0" cellspacing="0">
                   ${["Cliquez sur le bouton ci-dessus", "Connectez-vous avec votre email et mot de passe temporaire", "Changez votre mot de passe dans votre profil", "Utilisez votre PIN pour l'accès kiosk"].map((step, i) => `
                   <tr>
                     <td style="padding:5px 12px 5px 0;vertical-align:top">
-                      <span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;background:#FA7866;color:#fff;border-radius:50%;font-size:11px;font-weight:700">${i + 1}</span>
+                      <span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;background:#A4F5A6;color:#222222;border-radius:50%;font-size:11px;font-weight:700">${i + 1}</span>
                     </td>
                     <td style="padding:5px 0;font-size:13px;color:#555">${step}</td>
                   </tr>`).join("")}

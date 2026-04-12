@@ -101,7 +101,7 @@ function Navbar() {
           <Link href="/login" className="text-sm font-semibold text-gray-600 hover:text-gray-900 transition-colors px-4 py-2">
             Connexion
           </Link>
-          <Link href="/login" className="inline-flex items-center gap-2 bg-[#FA7866] hover:bg-[#E55C49] text-white text-sm font-bold px-5 py-2.5 rounded-xl transition-all shadow-sm shadow-[#FA7866]/30 hover:shadow-md hover:shadow-[#FA7866]/30 hover:-translate-y-0.5">
+          <Link href="/login" className="inline-flex items-center gap-2 bg-[#A4F5A6] hover:bg-[#6FCF71] text-white text-sm font-bold px-5 py-2.5 rounded-xl transition-all shadow-sm shadow-[#A4F5A6]/30 hover:shadow-md hover:shadow-[#A4F5A6]/30 hover:-translate-y-0.5">
             Démarrer gratuitement
             <ArrowRight className="w-4 h-4" strokeWidth={2} />
           </Link>
@@ -117,7 +117,7 @@ function Navbar() {
           {["Fonctionnalités", "Tarifs", "À propos"].map((item) => (
             <a key={item} href="#" className="text-sm font-medium text-gray-600">{item}</a>
           ))}
-          <Link href="/login" className="inline-flex items-center justify-center gap-2 bg-[#FA7866] text-white text-sm font-bold px-5 py-3 rounded-xl">
+          <Link href="/login" className="inline-flex items-center justify-center gap-2 bg-[#A4F5A6] text-[#222222] text-sm font-bold px-5 py-3 rounded-xl">
             Démarrer gratuitement <ArrowRight className="w-4 h-4" strokeWidth={2} />
           </Link>
         </div>
@@ -133,15 +133,15 @@ function Hero() {
     <section className="relative min-h-screen flex items-center overflow-hidden bg-white pt-16">
       {/* Animated blobs */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-[600px] h-[600px] bg-[#FA7866]/8 rounded-full blur-3xl animate-float" />
-        <div className="absolute top-1/2 -left-32 w-[400px] h-[400px] bg-[#FA7866]/5 rounded-full blur-3xl animate-float-rev" />
+        <div className="absolute -top-40 -right-40 w-[600px] h-[600px] bg-[#A4F5A6]/8 rounded-full blur-3xl animate-float" />
+        <div className="absolute top-1/2 -left-32 w-[400px] h-[400px] bg-[#A4F5A6]/5 rounded-full blur-3xl animate-float-rev" />
         <div className="absolute bottom-0 right-1/4 w-[300px] h-[300px] bg-blue-50 rounded-full blur-3xl animate-float" style={{ animationDelay: "2s" }} />
       </div>
 
       <div className="max-w-6xl mx-auto px-6 py-24 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
         {/* Left */}
         <div>
-          <div className="animate-fade-up inline-flex items-center gap-2 bg-[#FFF1EF] text-[#FA7866] text-xs font-bold px-3.5 py-1.5 rounded-full mb-6 border border-[#FA7866]/20">
+          <div className="animate-fade-up inline-flex items-center gap-2 bg-[#D4DCD3] text-[#222222] text-xs font-bold px-3.5 py-1.5 rounded-full mb-6 border border-[#A4F5A6]/20">
             <Zap className="w-3.5 h-3.5 animate-pulse-dot" strokeWidth={2} />
             Nouveau · Rapports en temps réel
           </div>
@@ -151,7 +151,7 @@ function Hero() {
             <span className="relative inline-block">
               <span className="relative z-10 text-shimmer">en temps réel.</span>
               <svg className="svg-draw absolute -bottom-1 left-0 w-full" viewBox="0 0 300 12" fill="none">
-                <path d="M2 9C60 3 120 1 150 1C180 1 240 3 298 9" stroke="#FA7866" strokeWidth="3" strokeLinecap="round" opacity="0.4"/>
+                <path d="M2 9C60 3 120 1 150 1C180 1 240 3 298 9" stroke="#A4F5A6" strokeWidth="3" strokeLinecap="round" opacity="0.4"/>
               </svg>
             </span>
           </h1>
@@ -161,7 +161,7 @@ function Hero() {
           </p>
 
           <div className="animate-fade-up delay-300 flex flex-wrap items-center gap-4 mb-10">
-            <Link href="/login" className="group inline-flex items-center gap-2 bg-[#FA7866] hover:bg-[#E55C49] text-white font-bold px-7 py-4 rounded-2xl transition-all shadow-lg shadow-[#FA7866]/25 hover:shadow-xl hover:shadow-[#FA7866]/30 hover:-translate-y-1">
+            <Link href="/login" className="group inline-flex items-center gap-2 bg-[#A4F5A6] hover:bg-[#6FCF71] text-white font-bold px-7 py-4 rounded-2xl transition-all shadow-lg shadow-[#A4F5A6]/25 hover:shadow-xl hover:shadow-[#A4F5A6]/30 hover:-translate-y-1">
               Démarrer gratuitement
               <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" strokeWidth={2} />
             </Link>
@@ -205,7 +205,7 @@ function Hero() {
                   { label: "Occupées",    value: "24", color: "text-blue-600",    bg: "bg-blue-500"    },
                   { label: "Disponibles", value: "8",  color: "text-green-600",   bg: "bg-green-500"   },
                   { label: "Nettoyage",   value: "5",  color: "text-amber-600",   bg: "bg-amber-500"   },
-                  { label: "Urgentes",    value: "2",  color: "text-[#FA7866]",   bg: "bg-[#FA7866]"   },
+                  { label: "Urgentes",    value: "2",  color: "text-[#222222]",   bg: "bg-[#A4F5A6]"   },
                 ].map((s, i) => (
                   <div key={s.label} className="bg-white rounded-xl p-3 shadow-sm animate-scale-in" style={{ animationDelay: `${0.4 + i * 0.1}s` }}>
                     <div className={cn("w-6 h-6 rounded-lg flex items-center justify-center mb-2", s.bg + "/10")}>
@@ -220,7 +220,7 @@ function Hero() {
               <div className="bg-white rounded-xl shadow-sm overflow-hidden mb-3">
                 <div className="px-3 py-2 border-b border-gray-50 flex items-center justify-between">
                   <p className="text-[11px] font-bold text-gray-600">Tâches en cours</p>
-                  <span className="text-[10px] bg-[#FFF1EF] text-[#FA7866] font-bold px-1.5 py-0.5 rounded-full animate-pulse">3 urgentes</span>
+                  <span className="text-[10px] bg-[#D4DCD3] text-[#222222] font-bold px-1.5 py-0.5 rounded-full animate-pulse">3 urgentes</span>
                 </div>
                 {[
                   { room: "201", task: "Nettoyage complet",        dept: "Housekeeping", color: "bg-sky-500",   dot: "bg-sky-100 text-sky-700"     },
@@ -241,10 +241,10 @@ function Hero() {
               <div className="bg-white rounded-xl shadow-sm p-3 animate-fade-up" style={{ animationDelay: "1s" }}>
                 <div className="flex items-center justify-between mb-2">
                   <p className="text-[11px] font-bold text-gray-600">Performance aujourd&apos;hui</p>
-                  <span className="text-[11px] font-extrabold text-[#FA7866]">78%</span>
+                  <span className="text-[11px] font-extrabold text-[#222222]">78%</span>
                 </div>
                 <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                  <div className="h-full bg-[#FA7866] rounded-full transition-all duration-1000" style={{ width: "78%", animation: "slideWidth 1.5s 1.2s ease both" }} />
+                  <div className="h-full bg-[#A4F5A6] rounded-full transition-all duration-1000" style={{ width: "78%", animation: "slideWidth 1.5s 1.2s ease both" }} />
                 </div>
                 <p className="text-[10px] text-gray-400 mt-1.5">42 sur 54 tâches terminées</p>
               </div>
@@ -263,8 +263,8 @@ function Hero() {
           </div>
 
           <div className="absolute -right-6 bottom-1/3 bg-white rounded-2xl shadow-xl border border-gray-100 px-4 py-3 flex items-center gap-2.5 animate-float-rev">
-            <div className="w-8 h-8 rounded-full bg-[#FFF1EF] flex items-center justify-center">
-              <Zap className="w-4 h-4 text-[#FA7866]" strokeWidth={2} />
+            <div className="w-8 h-8 rounded-full bg-[#D4DCD3] flex items-center justify-center">
+              <Zap className="w-4 h-4 text-[#222222]" strokeWidth={2} />
             </div>
             <div>
               <p className="text-[11px] font-bold text-gray-800">Tâche urgente assignée</p>
@@ -348,7 +348,7 @@ function Comparison() {
     <section className="py-28 bg-white">
       <div className="max-w-5xl mx-auto px-6">
         <Reveal className="text-center mb-16">
-          <p className="text-[#FA7866] text-sm font-bold uppercase tracking-widest mb-3">Le problème</p>
+          <p className="text-[#222222] text-sm font-bold uppercase tracking-widest mb-3">Le problème</p>
           <h2 className="text-[40px] font-extrabold text-gray-900 tracking-tight">Arrêtez de subir. Commencez à piloter.</h2>
           <p className="text-gray-500 mt-4 text-lg max-w-2xl mx-auto">Les hôtels perdent en moyenne 2h par jour en coordination manuelle. HotelHive automatise tout ça.</p>
         </Reveal>
@@ -371,15 +371,15 @@ function Comparison() {
             </ul>
           </Reveal>
 
-          <Reveal animation="slide-right" className="rounded-3xl border-2 border-[#FA7866]/20 bg-[#FFF1EF]/40 p-8">
-            <div className="inline-flex items-center gap-2 bg-[#FA7866] text-white text-xs font-bold px-3 py-1.5 rounded-full mb-6">
+          <Reveal animation="slide-right" className="rounded-3xl border-2 border-[#A4F5A6]/20 bg-[#D4DCD3]/40 p-8">
+            <div className="inline-flex items-center gap-2 bg-[#A4F5A6] text-[#222222] text-xs font-bold px-3 py-1.5 rounded-full mb-6">
               <CheckCircle2 className="w-3.5 h-3.5" strokeWidth={2.5} />
               Avec HotelHive
             </div>
             <ul className="flex flex-col gap-4">
               {newWay.map((item, i) => (
                 <li key={i} className="flex items-start gap-3 text-sm text-gray-700">
-                  <div className="w-5 h-5 rounded-full bg-[#FA7866] flex items-center justify-center shrink-0 mt-0.5">
+                  <div className="w-5 h-5 rounded-full bg-[#A4F5A6] flex items-center justify-center shrink-0 mt-0.5">
                     <CheckCircle2 className="w-3 h-3 text-white" strokeWidth={2.5} />
                   </div>
                   {item}
@@ -397,7 +397,7 @@ function Comparison() {
 
 const FEATURES = [
   { icon: BedDouble,    color: "bg-blue-50 text-blue-600",       title: "Statut des chambres en direct",    desc: "Suivez chaque chambre en temps réel. Disponible, occupée, nettoyage, maintenance — tout est visible en un coup d'œil." },
-  { icon: ClipboardList,color: "bg-[#FFF1EF] text-[#FA7866]",    title: "Gestion des tâches",               desc: "Créez, assignez et suivez les tâches de votre équipe. Vue kanban ou liste, avec priorités et délais." },
+  { icon: ClipboardList,color: "bg-[#D4DCD3] text-[#222222]",    title: "Gestion des tâches",               desc: "Créez, assignez et suivez les tâches de votre équipe. Vue kanban ou liste, avec priorités et délais." },
   { icon: Wrench,       color: "bg-amber-50 text-amber-600",      title: "Maintenance intégrée",             desc: "Tickets de maintenance directement liés aux chambres. L'équipe reçoit une notification immédiate sur son téléphone." },
   { icon: Bell,         color: "bg-purple-50 text-purple-600",    title: "Notifications en temps réel",      desc: "Chaque changement d'état déclenche une alerte à la bonne personne. Fini les oublis, fini les retards." },
   { icon: BarChart3,    color: "bg-green-50 text-green-600",      title: "Rapports & analytics",             desc: "Performance par employé, par département, par période. Exportez en CSV pour vos réunions d'équipe." },
@@ -409,7 +409,7 @@ function Features() {
     <section className="py-28 bg-gray-50" id="demo">
       <div className="max-w-6xl mx-auto px-6">
         <Reveal className="text-center mb-16">
-          <p className="text-[#FA7866] text-sm font-bold uppercase tracking-widest mb-3">Fonctionnalités</p>
+          <p className="text-[#222222] text-sm font-bold uppercase tracking-widest mb-3">Fonctionnalités</p>
           <h2 className="text-[40px] font-extrabold text-gray-900 tracking-tight">Tout ce dont vous avez besoin.</h2>
           <p className="text-gray-500 mt-4 text-lg max-w-xl mx-auto">Un seul outil pour coordonner toutes vos équipes, du manager au personnel de ménage.</p>
         </Reveal>
@@ -425,7 +425,7 @@ function Features() {
               <div className={cn("w-12 h-12 rounded-2xl flex items-center justify-center mb-5 transition-transform group-hover:scale-110 duration-300", color)}>
                 <Icon className="w-6 h-6" strokeWidth={1.5} />
               </div>
-              <h3 className="text-[17px] font-extrabold text-gray-900 mb-2 group-hover:text-[#FA7866] transition-colors duration-300">{title}</h3>
+              <h3 className="text-[17px] font-extrabold text-gray-900 mb-2 group-hover:text-[#222222] transition-colors duration-300">{title}</h3>
               <p className="text-sm text-gray-500 leading-relaxed">{desc}</p>
             </Reveal>
           ))}
@@ -439,7 +439,7 @@ function Features() {
 
 const STEPS = [
   { num: "01", icon: BedDouble,    title: "Sélectionnez une chambre et changez son statut",    desc: "Le manager ou la réception indique qu'une chambre nécessite un nettoyage ou une maintenance directement depuis le tableau de bord.",    badge: "Temps réel",  badgeColor: "bg-blue-50 text-blue-600"         },
-  { num: "02", icon: Users,         title: "La tâche est assignée automatiquement",              desc: "HotelHive sélectionne le membre du personnel le moins chargé et lui envoie une notification immédiate sur son téléphone.",              badge: "Automatique", badgeColor: "bg-[#FFF1EF] text-[#FA7866]"     },
+  { num: "02", icon: Users,         title: "La tâche est assignée automatiquement",              desc: "HotelHive sélectionne le membre du personnel le moins chargé et lui envoie une notification immédiate sur son téléphone.",              badge: "Automatique", badgeColor: "bg-[#D4DCD3] text-[#222222]"     },
   { num: "03", icon: CheckCircle2,  title: "Le staff complète et confirme",                     desc: "Le personnel valide la tâche depuis son téléphone, ajoute des photos si besoin, et la chambre passe automatiquement en disponible.",     badge: "Mobile",      badgeColor: "bg-green-50 text-green-600"       },
   { num: "04", icon: Shield,        title: "Le statut se met à jour pour tous",                 desc: "En temps réel, tout le monde voit la chambre disponible. La réception peut immédiatement attribuer la chambre au prochain client.",      badge: "Instantané",  badgeColor: "bg-purple-50 text-purple-600"     },
 ];
@@ -449,7 +449,7 @@ function HowItWorks() {
     <section className="py-28 bg-white">
       <div className="max-w-5xl mx-auto px-6">
         <Reveal className="text-center mb-16">
-          <p className="text-[#FA7866] text-sm font-bold uppercase tracking-widest mb-3">Fonctionnement</p>
+          <p className="text-[#222222] text-sm font-bold uppercase tracking-widest mb-3">Fonctionnement</p>
           <h2 className="text-[40px] font-extrabold text-gray-900 tracking-tight">Simple. Rapide. Efficace.</h2>
           <p className="text-gray-500 mt-4 text-lg">4 étapes pour une opération hôtelière sans friction.</p>
         </Reveal>
@@ -460,11 +460,11 @@ function HowItWorks() {
               key={num}
               delay={i * 120}
               animation="fade-up"
-              className="flex items-start gap-6 bg-gray-50 rounded-3xl p-6 border border-gray-100 hover:border-[#FA7866]/20 hover:bg-[#FFF1EF]/20 transition-all duration-300 group cursor-default"
+              className="flex items-start gap-6 bg-gray-50 rounded-3xl p-6 border border-gray-100 hover:border-[#A4F5A6]/20 hover:bg-[#D4DCD3]/20 transition-all duration-300 group cursor-default"
             >
               <div className="flex flex-col items-center gap-2 shrink-0">
-                <div className="w-12 h-12 rounded-2xl bg-white border border-gray-200 flex items-center justify-center shadow-sm group-hover:border-[#FA7866]/30 group-hover:shadow-md transition-all duration-300">
-                  <Icon className="w-5 h-5 text-gray-500 group-hover:text-[#FA7866] transition-colors duration-300" strokeWidth={1.5} />
+                <div className="w-12 h-12 rounded-2xl bg-white border border-gray-200 flex items-center justify-center shadow-sm group-hover:border-[#A4F5A6]/30 group-hover:shadow-md transition-all duration-300">
+                  <Icon className="w-5 h-5 text-gray-500 group-hover:text-[#222222] transition-colors duration-300" strokeWidth={1.5} />
                 </div>
                 {i < STEPS.length - 1 && <div className="w-px h-4 bg-gray-200" />}
               </div>
@@ -489,7 +489,7 @@ function HowItWorks() {
 const TESTIMONIALS = [
   { name: "Sophie Martin",  role: "Directrice, Hôtel Belle Époque",  avatar: "SM", color: "bg-blue-100 text-blue-700",         stars: 5, quote: "Depuis HotelHive, nos délais de nettoyage ont été réduits de 40%. L'équipe adore recevoir ses tâches directement sur le téléphone."               },
   { name: "Karim Benali",   role: "Manager, Résidence du Parc",      avatar: "KB", color: "bg-amber-100 text-amber-700",        stars: 5, quote: "La page rapports m'a permis d'identifier nos bottlenecks en 10 minutes. J'aurais mis des semaines avec Excel."                                       },
-  { name: "Claire Dumont",  role: "Responsable, Grand Hôtel",        avatar: "CD", color: "bg-[#FFF1EF] text-[#FA7866]",       stars: 5, quote: "L'interface est tellement claire que mon équipe a été autonome dès le premier jour. Zéro formation nécessaire."                                       },
+  { name: "Claire Dumont",  role: "Responsable, Grand Hôtel",        avatar: "CD", color: "bg-[#D4DCD3] text-[#222222]",       stars: 5, quote: "L'interface est tellement claire que mon équipe a été autonome dès le premier jour. Zéro formation nécessaire."                                       },
 ];
 
 function Testimonials() {
@@ -497,7 +497,7 @@ function Testimonials() {
     <section className="py-28 bg-gray-50">
       <div className="max-w-6xl mx-auto px-6">
         <Reveal className="text-center mb-16">
-          <p className="text-[#FA7866] text-sm font-bold uppercase tracking-widest mb-3">Témoignages</p>
+          <p className="text-[#222222] text-sm font-bold uppercase tracking-widest mb-3">Témoignages</p>
           <h2 className="text-[40px] font-extrabold text-gray-900 tracking-tight">Ils nous font confiance.</h2>
         </Reveal>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -532,7 +532,7 @@ function Testimonials() {
 
 const PLANS = [
   { name: "Basic",      price: "29",        desc: "Idéal pour les petits établissements", color: "border-gray-200", badge: null,             features: ["Jusqu'à 10 utilisateurs", "Gestion des chambres", "Tâches et assignation", "Notifications in-app", "Mode hors-ligne", "Support email"]                                 },
-  { name: "Pro",        price: "89",        desc: "Pour les hôtels qui veulent performer", color: "border-[#FA7866]", badge: "Le plus populaire", features: ["Jusqu'à 50 utilisateurs", "Tout le plan Basic", "Notifications push mobile", "Rapports & export CSV", "Tâches récurrentes", "Support prioritaire"]           },
+  { name: "Pro",        price: "89",        desc: "Pour les hôtels qui veulent performer", color: "border-[#A4F5A6]", badge: "Le plus populaire", features: ["Jusqu'à 50 utilisateurs", "Tout le plan Basic", "Notifications push mobile", "Rapports & export CSV", "Tâches récurrentes", "Support prioritaire"]           },
   { name: "Enterprise", price: "Sur mesure", desc: "Pour les groupes hôteliers",           color: "border-gray-200", badge: null,             features: ["Utilisateurs illimités", "Multi-hôtels", "White-label", "Intégration PMS / API", "SSO & sécurité avancée", "Account manager dédié"]                               },
 ];
 
@@ -541,7 +541,7 @@ function Pricing() {
     <section className="py-28 bg-white" id="tarifs">
       <div className="max-w-5xl mx-auto px-6">
         <Reveal className="text-center mb-16">
-          <p className="text-[#FA7866] text-sm font-bold uppercase tracking-widest mb-3">Tarifs</p>
+          <p className="text-[#222222] text-sm font-bold uppercase tracking-widest mb-3">Tarifs</p>
           <h2 className="text-[40px] font-extrabold text-gray-900 tracking-tight">Simple et transparent.</h2>
           <p className="text-gray-500 mt-4 text-lg">Commencez gratuitement pendant 14 jours. Sans carte bancaire.</p>
         </Reveal>
@@ -552,11 +552,11 @@ function Pricing() {
               className={cn(
                 "relative rounded-3xl border-2 p-7 flex flex-col hover:-translate-y-2 transition-all duration-300",
                 color,
-                badge ? "bg-[#FFF8F7] shadow-xl shadow-[#FA7866]/10" : "bg-white"
+                badge ? "bg-[#EEF1EE] shadow-xl shadow-[#A4F5A6]/10" : "bg-white"
               )}
             >
               {badge && (
-                <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-[#FA7866] text-white text-[11px] font-bold px-4 py-1.5 rounded-full whitespace-nowrap animate-pulse-dot">
+                <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-[#A4F5A6] text-[#222222] text-[11px] font-bold px-4 py-1.5 rounded-full whitespace-nowrap animate-pulse-dot">
                   {badge}
                 </div>
               )}
@@ -577,14 +577,14 @@ function Pricing() {
               <ul className="flex flex-col gap-3 mb-8 flex-1">
                 {features.map((f) => (
                   <li key={f} className="flex items-center gap-2.5 text-sm text-gray-600">
-                    <CheckCircle2 className="w-4 h-4 text-[#FA7866] shrink-0" strokeWidth={2} />
+                    <CheckCircle2 className="w-4 h-4 text-[#222222] shrink-0" strokeWidth={2} />
                     {f}
                   </li>
                 ))}
               </ul>
               <Link href="/login" className={cn(
                 "group inline-flex items-center justify-center gap-2 py-3.5 rounded-2xl text-sm font-bold transition-all",
-                badge ? "bg-[#FA7866] hover:bg-[#E55C49] text-white shadow-md shadow-[#FA7866]/25 hover:shadow-lg" : "bg-gray-100 hover:bg-gray-200 text-gray-800"
+                badge ? "bg-[#A4F5A6] hover:bg-[#6FCF71] text-white shadow-md shadow-[#A4F5A6]/25 hover:shadow-lg" : "bg-gray-100 hover:bg-gray-200 text-gray-800"
               )}>
                 {price === "Sur mesure" ? "Nous contacter" : "Commencer gratuitement"}
                 <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-1" strokeWidth={2} />
@@ -604,7 +604,7 @@ function CTA() {
     <section className="py-28 px-6">
       <div className="max-w-4xl mx-auto">
         <Reveal animation="scale-in">
-          <div className="relative bg-[#FA7866] rounded-[40px] overflow-hidden px-12 py-16 text-center">
+          <div className="relative bg-[#A4F5A6] rounded-[40px] overflow-hidden px-12 py-16 text-center">
             <div className="absolute inset-0 pointer-events-none overflow-hidden">
               <div className="absolute -top-20 -right-20 w-64 h-64 bg-white/10 rounded-full animate-float" />
               <div className="absolute -bottom-16 -left-16 w-48 h-48 bg-white/10 rounded-full animate-float-rev" />
@@ -617,7 +617,7 @@ function CTA() {
               <p className="text-white/80 text-lg mb-10 max-w-xl mx-auto">
                 Rejoignez des centaines d&apos;hôtels qui ont réduit leurs délais et boosté leur satisfaction client.
               </p>
-              <Link href="/login" className="group inline-flex items-center gap-2 bg-white text-[#FA7866] font-extrabold px-8 py-4 rounded-2xl hover:bg-gray-50 transition-all shadow-xl hover:shadow-2xl hover:-translate-y-1">
+              <Link href="/login" className="group inline-flex items-center gap-2 bg-white text-[#222222] font-extrabold px-8 py-4 rounded-2xl hover:bg-gray-50 transition-all shadow-xl hover:shadow-2xl hover:-translate-y-1">
                 Démarrer gratuitement — 14 jours
                 <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" strokeWidth={2} />
               </Link>

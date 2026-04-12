@@ -114,7 +114,7 @@ function defaultHotelFull(h: HotelFull): HotelFull {
     tourism_tax:        h.tourism_tax         ?? 0,
     extra_bed_price:    h.extra_bed_price     ?? 0,
     cancellation_hours: h.cancellation_hours  ?? 24,
-    brand_color:        h.brand_color         ?? "#FA7866",
+    brand_color:        h.brand_color         ?? "#A4F5A6",
   };
 }
 
