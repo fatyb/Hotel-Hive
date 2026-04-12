@@ -44,7 +44,9 @@
       "Bash(npx tsc:*)",
       "Bash(npm list:*)",
       "Bash(node -e \"const lr = require\\('D:/web/Hotel-Hive/node_modules/lucide-react'\\); console.log\\(Object.keys\\(lr\\).filter\\(k => k.toLowerCase\\(\\).includes\\('insta'\\) || k.toLowerCase\\(\\).includes\\('face'\\) || k.toLowerCase\\(\\).includes\\('bell'\\)\\).join\\(', '\\)\\)\")",
-      "Bash(node -e ':*)"
+      "Bash(node -e ':*)",
+      "WebFetch(domain:uithemes.app)",
+      "WebFetch(domain:shadcnthemes.app)"
     ]
   }
 }

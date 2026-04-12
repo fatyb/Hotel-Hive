@@ -46,10 +46,10 @@ function OccupancyRing({ pct, size = 80 }: { pct: number; size?: number }) {
     <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="-rotate-90">
       <circle cx={size/2} cy={size/2} r={r} fill="none" stroke="currentColor" className="text-muted" strokeWidth={8} />
       {/* Purple secondary ring (inner) */}
-      <circle cx={size/2} cy={size/2} r={r - 6} fill="none" stroke="#B3A0FF" strokeWidth={3}
+      <circle cx={size/2} cy={size/2} r={r - 6} fill="none" stroke="oklch(0.87 0.065 274.039)" strokeWidth={3}
         strokeDasharray={`${dash2} ${circ}`} strokeLinecap="round" opacity={0.5} />
       {/* Green primary ring */}
-      <circle cx={size/2} cy={size/2} r={r} fill="none" stroke="#A4F5A6" strokeWidth={8}
+      <circle cx={size/2} cy={size/2} r={r} fill="none" stroke="oklch(0.897 0.196 126.665)" strokeWidth={8}
         strokeDasharray={`${dash} ${circ}`} strokeLinecap="round" />
     </svg>
   );
@@ -118,33 +118,45 @@ export default function DashboardPage() {
   const occupancyPct   = stats.roomsTotal > 0 ? Math.round((stats.roomsOccupied / stats.roomsTotal) * 100) : 0;
   const roomsAvailable = Math.max(0, stats.roomsTotal - stats.roomsOccupied - stats.roomsDirty - stats.roomsMaintenance);
 
+  // Theme colours (new palette — use inline styles to avoid Tailwind parsing issues)
+  const CLR_PRIMARY = "oklch(0.897 0.196 126.665)";   // lime green
+  const CLR_PRIMARY_DIM = "oklch(0.45 0.18 128)";     // dark lime
+  const CLR_BLUE    = "oklch(0.87 0.065 274.039)";    // chart blue
+  const CLR_BLUE_DIM = "oklch(0.45 0.12 274)";        // dark blue
+
   const roomStatusRows = [
-    { label: "Disponibles", count: roomsAvailable,         bg: "bg-[#A4F5A6]", bar: "#A4F5A6", text: "text-[#1E7B20]" },
-    { label: "Occupées",    count: stats.roomsOccupied,    bg: "bg-[#B3A0FF]", bar: "#B3A0FF", text: "text-[#5B3FCC]" },
-    { label: "Nettoyage",   count: stats.roomsDirty,       bg: "bg-amber-400", bar: "#FBBF24", text: "text-amber-600" },
-    { label: "Maintenance", count: stats.roomsMaintenance, bg: "bg-red-400",   bar: "#F87171", text: "text-red-600"   },
+    { label: "Disponibles", count: roomsAvailable,         dot: CLR_PRIMARY, bar: CLR_PRIMARY, textColor: CLR_PRIMARY_DIM },
+    { label: "Occupées",    count: stats.roomsOccupied,    dot: CLR_BLUE,    bar: CLR_BLUE,    textColor: CLR_BLUE_DIM    },
+    { label: "Nettoyage",   count: stats.roomsDirty,       dot: "#FBBF24",   bar: "#FBBF24",   textColor: "#92400e"       },
+    { label: "Maintenance", count: stats.roomsMaintenance, dot: "#F87171",   bar: "#F87171",   textColor: "#991b1b"       },
   ];
 
   const statCards = [
     {
-      value: stats.tasksUrgent,     label: "Tâches urgentes",
-      icon: <AlertTriangle className="w-5 h-5" strokeWidth={1.5} style={{ color: "#A4F5A6" }} />,
-      iconBg: "bg-[#A4F5A6]/20", valueClass: "text-[#1E7B20]",
+      value: stats.tasksUrgent,      label: "Tâches urgentes",
+      icon: <AlertTriangle className="w-5 h-5" strokeWidth={1.5} style={{ color: CLR_PRIMARY }} />,
+      iconStyle: { background: `color-mix(in oklch, ${CLR_PRIMARY} 15%, transparent)` },
+      valueStyle: { color: CLR_PRIMARY_DIM },
     },
     {
-      value: stats.tasksInProgress, label: "En cours",
-      icon: <Clock className="w-5 h-5" strokeWidth={1.5} style={{ color: "#B3A0FF" }} />,
-      iconBg: "bg-[#B3A0FF]/20",  valueClass: "text-[#5B3FCC]",
+      value: stats.tasksInProgress,  label: "En cours",
+      icon: <Clock className="w-5 h-5" strokeWidth={1.5} style={{ color: CLR_BLUE }} />,
+      iconStyle: { background: `color-mix(in oklch, ${CLR_BLUE} 15%, transparent)` },
+      valueStyle: { color: CLR_BLUE_DIM },
     },
     {
-      value: stats.tasksDone,       label: "Terminées aujourd'hui",
-      icon: <CheckCircle className="w-5 h-5 text-[#222222]" strokeWidth={1.5} />,
-      iconBg: "bg-[#222222]/10",   valueClass: "text-[#222222]",
+      value: stats.tasksDone,        label: "Terminées aujourd'hui",
+      icon: <CheckCircle className="w-5 h-5" strokeWidth={1.5} style={{ color: CLR_PRIMARY }} />,
+      iconStyle: { background: `color-mix(in oklch, ${CLR_PRIMARY} 10%, transparent)` },
+      valueStyle: { color: CLR_PRIMARY_DIM },
     },
     {
-      value: stats.roomsDirty,      label: "Chambres à nettoyer",
+      value: stats.roomsDirty,       label: "Chambres à nettoyer",
       icon: <BedDouble className="w-5 h-5 text-amber-500" strokeWidth={1.5} />,
-      iconBg: "bg-amber-50 dark:bg-amber-900/30", valueClass: "text-amber-600",
+      iconStyle: {},
+      valueStyle: {},
+      iconBgClass: "bg-amber-50 dark:bg-amber-900/30",
+      valueClass: "text-amber-600",
     },
   ];
 
@@ -154,13 +166,14 @@ export default function DashboardPage() {
 
       {/* Stat cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {statCards.map(({ value, label, icon, iconBg, valueClass }) => (
+        {statCards.map(({ value, label, icon, iconStyle, valueStyle, iconBgClass, valueClass }) => (
           <Card key={label}>
             <CardContent className="p-5">
-              <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-4 ${iconBg}`}>
+              <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center mb-4", iconBgClass)}
+                style={iconStyle}>
                 {icon}
               </div>
-              <p className={`text-[32px] font-extrabold leading-none ${valueClass}`}>{value}</p>
+              <p className={cn("text-[32px] font-extrabold leading-none", valueClass)} style={valueStyle}>{value}</p>
               <p className="text-xs text-muted-foreground mt-2 font-medium">{label}</p>
             </CardContent>
           </Card>
@@ -216,14 +229,13 @@ export default function DashboardPage() {
                     </div>
                     <p className="col-span-2 text-xs text-muted-foreground truncate">{task.location || "—"}</p>
                     <div className="col-span-2 flex justify-end">
-                      <span className={cn(
-                        "inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold",
-                        task.status === "en_cours"
-                          ? "text-[#5B3FCC]"
-                          : "text-muted-foreground"
-                      )} style={{
-                        background: task.status === "en_cours" ? "#B3A0FF30" : undefined,
-                      }}>
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold"
+                        style={{
+                          color: task.status === "en_cours" ? CLR_BLUE_DIM : undefined,
+                          background: task.status === "en_cours"
+                            ? `color-mix(in oklch, ${CLR_BLUE} 18%, transparent)`
+                            : undefined,
+                        }}>
                         {STATUS_LABEL[task.status]}
                       </span>
                     </div>
@@ -266,10 +278,10 @@ export default function DashboardPage() {
                 </div>
               </div>
               <div className="flex flex-col gap-2.5">
-                {roomStatusRows.map(({ label, count, bg, bar, text }) => (
+                {roomStatusRows.map(({ label, count, dot, bar, textColor }) => (
                   <div key={label} className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <div className={`w-2 h-2 rounded-full ${bg}`} />
+                      <div className="w-2 h-2 rounded-full" style={{ background: dot }} />
                       <span className="text-xs text-muted-foreground">{label}</span>
                     </div>
                     <div className="flex items-center gap-2">
@@ -277,7 +289,7 @@ export default function DashboardPage() {
                         <div className="h-full rounded-full"
                           style={{ width: stats.roomsTotal > 0 ? `${(count / stats.roomsTotal) * 100}%` : "0%", background: bar }} />
                       </div>
-                      <span className={`text-xs font-bold w-4 text-right ${text}`}>{count}</span>
+                      <span className="text-xs font-bold w-4 text-right" style={{ color: textColor }}>{count}</span>
                     </div>
                   </div>
                 ))}
@@ -304,12 +316,14 @@ export default function DashboardPage() {
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-3">
-                <div className="rounded-xl p-3 text-center" style={{ background: "#B3A0FF20" }}>
-                  <p className="text-xl font-extrabold" style={{ color: "#5B3FCC" }}>{stats.tasksInProgress}</p>
+                <div className="rounded-xl p-3 text-center"
+                  style={{ background: `color-mix(in oklch, ${CLR_BLUE} 12%, transparent)` }}>
+                  <p className="text-xl font-extrabold" style={{ color: CLR_BLUE_DIM }}>{stats.tasksInProgress}</p>
                   <p className="text-[11px] text-muted-foreground mt-0.5">En cours</p>
                 </div>
-                <div className="rounded-xl p-3 text-center" style={{ background: "#A4F5A620" }}>
-                  <p className="text-xl font-extrabold" style={{ color: "#1E7B20" }}>{stats.tasksDone}</p>
+                <div className="rounded-xl p-3 text-center"
+                  style={{ background: `color-mix(in oklch, ${CLR_PRIMARY} 12%, transparent)` }}>
+                  <p className="text-xl font-extrabold" style={{ color: CLR_PRIMARY_DIM }}>{stats.tasksDone}</p>
                   <p className="text-[11px] text-muted-foreground mt-0.5">Terminées</p>
                 </div>
               </div>

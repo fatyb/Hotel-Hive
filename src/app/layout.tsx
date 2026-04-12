@@ -1,12 +1,10 @@
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans, Geist } from "next/font/google";
+import { Sora } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 
-const geist = Geist({subsets:['latin'],variable:'--font-sans'});
-
-const jakarta = Plus_Jakarta_Sans({
-  variable: "--font-jakarta",
+const sora = Sora({
+  variable: "--font-sora",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700", "800"],
 });
@@ -23,7 +21,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="fr" className={cn("h-full", "antialiased", jakarta.variable, "font-sans", geist.variable)} suppressHydrationWarning>
+    <html lang="fr" className={cn("h-full", "antialiased", sora.variable)} suppressHydrationWarning>
       <head>
         {/* Apply saved theme before React hydrates — prevents flash */}
         <script
