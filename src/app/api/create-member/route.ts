@@ -1,6 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import { NextRequest, NextResponse } from "next/server";
-import { Resend } from "resend";
+import nodemailer from "nodemailer";
 
 // ── helpers ───────────────────────────────────────────────────────────────────
 function generatePIN(): string {
@@ -217,30 +217,32 @@ export async function POST(req: NextRequest) {
     let email_sent = false;
     let email_error = "";
 
-    if (process.env.RESEND_API_KEY) {
+    if (process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD) {
       try {
-        const resend = new Resend(process.env.RESEND_API_KEY);
-        const { data: mailData, error: mailErr } = await resend.emails.send({
-          from: "HotelHive <onboarding@resend.dev>",
+        const transporter = nodemailer.createTransport({
+          service: "gmail",
+          auth: {
+            user: process.env.GMAIL_USER,
+            pass: process.env.GMAIL_APP_PASSWORD,
+          },
+        });
+
+        await transporter.sendMail({
+          from: `"HotelHive 🏨" <${process.env.GMAIL_USER}>`,
           to: email,
           subject: `Bienvenue dans l'équipe ${hotel_name} — HotelHive`,
           html: buildWelcomeEmail({ full_name, email, temp_password: tempPwd, pin, hotel_name, app_url }),
         });
 
-        if (mailErr) {
-          email_error = mailErr.message;
-          console.error("❌ Resend error:", mailErr);
-        } else {
-          email_sent = true;
-          console.log("✅ Email sent, id:", mailData?.id);
-        }
+        email_sent = true;
+        console.log("✅ Email sent via Gmail to:", email);
       } catch (mailErr) {
         email_error = String(mailErr);
-        console.error("❌ Resend exception:", mailErr);
+        console.error("❌ Gmail error:", mailErr);
       }
     } else {
-      email_error = "RESEND_API_KEY not set";
-      console.warn("⚠️  RESEND_API_KEY is missing");
+      email_error = "GMAIL_USER or GMAIL_APP_PASSWORD not set";
+      console.warn("⚠️  Gmail credentials missing in .env.local");
     }
 
     return NextResponse.json({
