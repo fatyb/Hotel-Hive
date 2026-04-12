@@ -58,9 +58,9 @@ export default function Sidebar() {
   const initials = userName.trim().split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase();
 
   return (
-    <aside className="w-60 bg-card border-r border-border flex flex-col min-h-screen shrink-0 transition-colors">
+    <aside className="w-60 flex flex-col min-h-screen shrink-0" style={{ background: "#222222" }}>
       {/* Logo */}
-      <div className="px-6 py-5 border-b border-border">
+      <div className="px-6 py-5" style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
         <Logo width={130} />
       </div>
 
@@ -70,16 +70,15 @@ export default function Sidebar() {
           const isActive = pathname === href;
           return (
             <Link key={href} href={href}>
-              <Button
-                variant={isActive ? "secondary" : "ghost"}
-                className={cn(
-                  "w-full justify-start gap-3 font-semibold",
-                  isActive && "bg-primary/10 text-primary hover:bg-primary/15 hover:text-primary"
-                )}
-              >
+              <span className={cn(
+                "flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-semibold transition-all cursor-pointer",
+                isActive
+                  ? "bg-[#A4F5A6] text-[#222222]"
+                  : "text-white/60 hover:text-white hover:bg-white/8"
+              )}>
                 <Icon className="w-[18px] h-[18px] shrink-0" strokeWidth={1.5} />
                 {label}
-              </Button>
+              </span>
             </Link>
           );
         })}
@@ -87,43 +86,39 @@ export default function Sidebar() {
 
       {/* Front Office link */}
       <div className="px-3 pb-2">
-        <Separator className="mb-2" />
+        <div className="mb-2" style={{ borderTop: "1px solid rgba(255,255,255,0.08)", marginBottom: "8px", paddingTop: "8px" }} />
         {NAV_EXTERNAL.map(({ href, label, icon: Icon }) => (
           <Link key={href} href={href}>
-            <Button
-              variant="ghost"
-              className="w-full justify-start gap-3 font-semibold text-primary hover:text-primary hover:bg-primary/10"
-            >
+            <span className="flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-semibold text-[#A4F5A6] hover:bg-[#A4F5A6]/10 transition-all cursor-pointer">
               <Icon className="w-[18px] h-[18px] shrink-0" strokeWidth={1.5} />
               {label}
-            </Button>
+            </span>
           </Link>
         ))}
       </div>
 
-      <Separator />
+      <div style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }} />
 
       {/* User info + logout */}
       <div className="px-3 py-4 flex flex-col gap-1">
         <div className="flex items-center gap-3 px-3 py-2">
           <Avatar className="w-8 h-8 shrink-0">
-            <AvatarFallback className="bg-primary text-primary-foreground text-[11px] font-bold">
+            <AvatarFallback className="bg-[#A4F5A6] text-[#222222] text-[11px] font-bold">
               {initials || "?"}
             </AvatarFallback>
           </Avatar>
           <div className="min-w-0 flex-1">
-            <p className="text-sm font-semibold truncate">{userName}</p>
-            <p className="text-xs text-muted-foreground truncate">{hotelName}</p>
+            <p className="text-sm font-semibold text-white truncate">{userName}</p>
+            <p className="text-xs text-white/40 truncate">{hotelName}</p>
           </div>
         </div>
-        <Button
-          variant="ghost"
+        <button
           onClick={handleLogout}
-          className="w-full justify-start gap-2 text-muted-foreground"
+          className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm text-white/40 hover:text-white hover:bg-white/8 transition-all w-full text-left"
         >
           <LogOut className="w-4 h-4" strokeWidth={1.5} />
           Déconnexion
-        </Button>
+        </button>
       </div>
     </aside>
   );
