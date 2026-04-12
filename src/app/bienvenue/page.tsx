@@ -1,13 +1,14 @@
 "use client";
 
 import { useEffect, useState, Suspense } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
   CheckCircle, Smartphone, Key, LogIn,
-  ArrowRight, Hotel, Shield, Star,
+  ArrowRight, Hotel, Shield, Star, LogOut,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { createClient } from "@/lib/supabase/client";
 
 // ── Step card ─────────────────────────────────────────────────────────────────
 function Step({
@@ -50,17 +51,30 @@ function Step({
 
 // ── Main (inner) ──────────────────────────────────────────────────────────────
 function BienvenueContent() {
-  const params = useSearchParams();
-  const router = useRouter();
+  const params   = useSearchParams();
+  const supabase = createClient();
 
   const email = params.get("email") ?? "";
-  const [step, setStep] = useState(0);
+  const [step,           setStep]           = useState(0);
+  const [currentUser,    setCurrentUser]    = useState<string | null>(null);
+  const [signingOut,     setSigningOut]     = useState(false);
 
-  // Auto-advance intro
+  // Check if someone is already logged in
   useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      if (data.user) setCurrentUser(data.user.email ?? data.user.id);
+    });
     const t = setTimeout(() => setStep(1), 800);
     return () => clearTimeout(t);
   }, []);
+
+  async function handleSignOutAndLogin() {
+    setSigningOut(true);
+    await supabase.auth.signOut();
+    window.location.href = email
+      ? `/login?email=${encodeURIComponent(email)}`
+      : "/login";
+  }
 
   const loginHref = email
     ? `/login?email=${encodeURIComponent(email)}`
@@ -123,13 +137,34 @@ function BienvenueContent() {
 
         {/* CTA */}
         <div className="px-6 pb-6 space-y-3">
-          <Link
-            href={loginHref}
-            className="flex items-center justify-center gap-2 w-full bg-primary text-primary-foreground font-bold py-3.5 rounded-xl hover:bg-primary/90 transition-colors"
-          >
-            Se connecter maintenant
-            <ArrowRight className="w-4 h-4" />
-          </Link>
+          {/* Already logged in as someone else → sign out first */}
+          {currentUser && currentUser !== email ? (
+            <div className="space-y-3">
+              <div className="text-xs text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 px-4 py-3 rounded-xl flex items-start gap-2">
+                <LogOut className="w-4 h-4 shrink-0 mt-0.5" />
+                <span>
+                  Vous êtes connecté en tant que <strong>{currentUser}</strong>.
+                  Vous devez vous déconnecter pour accéder à votre nouvel espace.
+                </span>
+              </div>
+              <button
+                onClick={handleSignOutAndLogin}
+                disabled={signingOut}
+                className="flex items-center justify-center gap-2 w-full bg-primary text-primary-foreground font-bold py-3.5 rounded-xl hover:bg-primary/90 transition-colors disabled:opacity-60"
+              >
+                {signingOut ? "Déconnexion..." : "Se déconnecter et accéder à mon espace"}
+                {!signingOut && <ArrowRight className="w-4 h-4" />}
+              </button>
+            </div>
+          ) : (
+            <Link
+              href={loginHref}
+              className="flex items-center justify-center gap-2 w-full bg-primary text-primary-foreground font-bold py-3.5 rounded-xl hover:bg-primary/90 transition-colors"
+            >
+              Se connecter maintenant
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          )}
 
           <div className="flex items-center gap-2 justify-center text-xs text-muted-foreground">
             <Shield className="w-3.5 h-3.5" />
