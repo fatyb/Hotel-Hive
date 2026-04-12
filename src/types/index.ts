@@ -57,6 +57,7 @@ export type Room = {
   is_occupied: boolean;
   notes?: string;
   updated_at: string;
+  room_type_id?: string;
 };
 
 export type ShiftType = "matin" | "apres-midi" | "nuit" | "repos";
@@ -127,4 +128,41 @@ export type Notification = {
   data?: Record<string, string>;
   is_read: boolean;
   created_at: string;
+};
+
+export type RoomType = {
+  id: string;
+  hotel_id: string;
+  name: string;
+  icon: string;
+  description?: string;
+  capacity: number;
+  base_price: number;
+  amenities: string[];
+  created_at: string;
+};
+
+export type HotelFull = Hotel & {
+  address?: string;
+  phone?: string;
+  website?: string;
+  currency: string;
+  checkin_time: string;
+  checkout_time: string;
+  vat_rate: number;
+  tourism_tax: number;
+  extra_bed_price: number;
+  cancellation_hours: number;
+  logo_url?: string;
+  brand_color: string;
+  social_instagram?: string;
+  social_facebook?: string;
+};
+
+export type HotelFacility = {
+  id: string;
+  hotel_id: string;
+  name: string;
+  icon: string;
+  is_available: boolean;
 };
