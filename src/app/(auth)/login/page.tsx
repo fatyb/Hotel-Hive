@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, Suspense } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Logo } from "@/components/ui/Logo";
 import { Button } from "@/components/ui/button";
@@ -11,7 +11,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 
 function LoginForm() {
   const params   = useSearchParams();
-  const router   = useRouter();
   const supabase = createClient();
 
   const [email,    setEmail]    = useState(params.get("email") ?? "");
@@ -41,14 +40,19 @@ function LoginForm() {
       return;
     }
 
-    const { data: prof } = await supabase
+    const { data: prof, error: profError } = await supabase
       .from("profiles")
       .select("role")
       .eq("id", data.user.id)
       .single();
 
-    router.refresh();
-    router.push(prof?.role === "manager" ? "/dashboard" : "/mes-taches");
+    console.log("✅ Logged in:", data.user.email);
+    console.log("📋 Profile:", prof, "Error:", profError);
+
+    const destination = prof?.role === "manager" ? "/dashboard" : "/mes-taches";
+    console.log("➡️ Redirecting to:", destination);
+
+    window.location.href = destination;
   }
 
   return (
